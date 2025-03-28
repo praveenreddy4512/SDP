@@ -27,35 +27,55 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/api/reports') || 
     request.nextUrl.pathname.startsWith('/api/vendors');
   
-  if (isAdminApiRoute && isAuthenticated && token?.role === 'ADMIN') {
-    return NextResponse.next();
-  }
-
   // Skip auth check for public routes and machine page
   if (isPublicApiRoute || isMachinePage || isMachinePublicRequest) {
     return NextResponse.next();
   }
 
-  // Redirect unauthenticated users to login
-  if (!isAuthenticated && (isAdminRoute || isVendorRoute)) {
-    const url = new URL('/auth/login', request.url);
-    url.searchParams.set('callbackUrl', request.nextUrl.pathname);
-    return NextResponse.redirect(url);
+  // Handle admin API routes
+  if (isAdminApiRoute) {
+    if (!isAuthenticated || token?.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    return NextResponse.next();
   }
 
-  // Check for admin routes
-  if (isAdminRoute && token?.role !== 'ADMIN') {
-    return NextResponse.redirect(new URL('/', request.url));
+  // Handle auth routes
+  if (isAuthRoute) {
+    if (isAuthenticated) {
+      // If user is already authenticated, redirect to appropriate dashboard
+      if (token?.role === 'ADMIN') {
+        return NextResponse.redirect(new URL('/admin', request.url));
+      } else if (token?.role === 'VENDOR') {
+        return NextResponse.redirect(new URL('/vendor-pos', request.url));
+      } else {
+        return NextResponse.redirect(new URL('/search', request.url));
+      }
+    }
+    return NextResponse.next();
   }
 
-  // Check for vendor routes
-  if (isVendorRoute && token?.role !== 'VENDOR' && token?.role !== 'ADMIN') {
-    return NextResponse.redirect(new URL('/', request.url));
+  // Handle protected routes
+  if (isAdminRoute || isVendorRoute) {
+    if (!isAuthenticated) {
+      const url = new URL('/auth/login', request.url);
+      url.searchParams.set('callbackUrl', request.nextUrl.pathname);
+      return NextResponse.redirect(url);
+    }
+
+    // Check role-based access
+    if (isAdminRoute && token?.role !== 'ADMIN') {
+      return NextResponse.redirect(new URL('/', request.url));
+    }
+
+    if (isVendorRoute && token?.role !== 'VENDOR' && token?.role !== 'ADMIN') {
+      return NextResponse.redirect(new URL('/', request.url));
+    }
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/vendor-pos/:path*', '/api/:path*', '/machine/:path*'],
+  matcher: ['/admin/:path*', '/vendor-pos/:path*', '/api/:path*', '/machine/:path*']
 }; 

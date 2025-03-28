@@ -2,13 +2,14 @@
 
 import React, { useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -27,18 +28,22 @@ export default function LoginPage() {
       setError(null);
       
       const result = await signIn('credentials', {
-        redirect: false,
         email,
         password,
+        redirect: false
       });
       
       if (result?.error) {
         setError('Invalid email or password');
         return;
       }
+
+      // Get the callback URL or default to admin
+      const callbackUrl = searchParams.get('callbackUrl') || '/admin';
       
-      // Redirect based on user role (handled in the useSession hook)
-      router.push('/dashboard');
+      // Use router.push instead of window.location
+      router.push(callbackUrl);
+      
     } catch (err) {
       console.error('Login error:', err);
       setError('An error occurred during login. Please try again.');
@@ -48,78 +53,67 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <Card className="w-full max-w-md">
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Bus Ticket Vending System</h1>
-          <p className="text-gray-600">Login to your account</p>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Sign in to your account
+          </h2>
         </div>
-        
-        {error && (
-          <div className="bg-red-50 text-red-600 p-4 rounded-md mb-6">
-            {error}
-          </div>
-        )}
-        
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter your email"
-              required
-            />
-          </div>
-          
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter your password"
-              required
-            />
-          </div>
-          
-          <Button
-            type="submit"
-            fullWidth
-            isLoading={isLoading}
-          >
-            Login
-          </Button>
-        </form>
-        
-        <div className="mt-6 text-center text-sm">
-          <p className="text-gray-600">
-            <Link href="/" className="text-blue-600 hover:text-blue-800">
-              ← Back to Home
-            </Link>
-          </p>
-        </div>
-        
-        <div className="mt-8 border-t pt-6">
-          <div className="bg-blue-50 p-4 rounded-md">
-            <h3 className="font-medium text-blue-800 mb-1">Demo Accounts</h3>
-            <p className="text-sm text-blue-700 mb-2">Use these credentials to test the system:</p>
-            <div className="text-xs space-y-1 text-blue-600">
-              <p><strong>Admin:</strong> admin@buspos.com / admin123</p>
-              <p><strong>Vendor:</strong> vendor@buspos.com / vendor123</p>
+        <Card className="mt-8">
+          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+            <div className="rounded-md shadow-sm -space-y-px">
+              <div>
+                <label htmlFor="email" className="sr-only">
+                  Email address
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                  placeholder="Email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <div>
+                <label htmlFor="password" className="sr-only">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
             </div>
-          </div>
-        </div>
-      </Card>
+
+            {error && (
+              <div className="text-red-500 text-sm text-center">{error}</div>
+            )}
+
+            <div>
+              <Button
+                type="submit"
+                fullWidth
+                disabled={isLoading}
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                {isLoading ? 'Signing in...' : 'Sign in'}
+              </Button>
+            </div>
+          </form>
+        </Card>
+      </div>
     </div>
   );
 } 

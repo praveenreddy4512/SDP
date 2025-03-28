@@ -5,6 +5,7 @@ import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import Logo from '@/components/Logo';
 import AdminSidebar from '@/components/AdminSidebar';
+import { authOptions } from '@/lib/auth';
 
 export const metadata: Metadata = {
   title: 'APSRTC Admin',
@@ -16,7 +17,7 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   
   // Redirect if user is not authenticated or not an admin
   if (!session || session.user.role !== 'ADMIN') {
