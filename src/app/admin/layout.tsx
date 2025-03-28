@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import Logo from '@/components/Logo';
 import AdminSidebar from '@/components/AdminSidebar';
 
@@ -17,7 +16,7 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession();
   
   // Redirect if user is not authenticated or not an admin
   if (!session || session.user.role !== 'ADMIN') {

@@ -1,36 +1,132 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# APSRTC Bus Ticketing System
 
-## Getting Started
+A full-featured bus ticketing system for APSRTC, built with Next.js, Prisma, and PostgreSQL.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- 🚌 Comprehensive bus management for APSRTC routes
+- 🎫 Ticket booking and reservation system
+- 🧑‍💼 Vendor POS system for bus operators
+- 🔐 Admin dashboard for system management
+- 🤖 Self-service kiosk interface
+- 📊 Analytics and reporting capabilities
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Frontend**: Next.js 15, React 19, TailwindCSS
+- **Backend**: Next.js API Routes, Prisma ORM
+- **Database**: PostgreSQL 
+- **Authentication**: NextAuth.js
+- **Deployment**: Vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Deployment on Vercel
 
-## Learn More
+### Prerequisites
 
-To learn more about Next.js, take a look at the following resources:
+1. A [Vercel](https://vercel.com) account
+2. A PostgreSQL database (You can use [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres) or any other PostgreSQL provider)
+3. Git repository with your code
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Steps to Deploy
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **Fork or clone this repository**
 
-## Deploy on Vercel
+   ```
+   git clone https://github.com/yourusername/apsrtc-bus-ticketing.git
+   cd apsrtc-bus-ticketing
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+2. **Create a PostgreSQL Database**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   You can create a PostgreSQL database on Vercel:
+   
+   - Go to the [Vercel Dashboard](https://vercel.com/dashboard)
+   - Click on "Storage"
+   - Select "Create Postgres Database"
+   - Follow the instructions to set up your database
+
+   Or use any other PostgreSQL provider of your choice.
+
+3. **Set up environment variables**
+
+   Create a `.env.local` file with the required environment variables:
+
+   ```
+   DATABASE_URL="postgres://username:password@host:5432/database?sslmode=require"
+   NEXTAUTH_SECRET="your-secret-key"
+   NEXTAUTH_URL="https://your-vercel-deployment-url.vercel.app"
+   ```
+
+4. **Push to GitHub**
+
+   ```
+   git add .
+   git commit -m "Ready for deployment"
+   git push
+   ```
+
+5. **Deploy to Vercel**
+
+   - Go to the [Vercel Dashboard](https://vercel.com/dashboard)
+   - Click "Add New" > "Project"
+   - Select your repository
+   - Configure your project:
+     - Set the Framework Preset to "Next.js"
+     - Add the environment variables from your `.env.local` file
+   - Click "Deploy"
+
+6. **Run database migrations**
+
+   After deployment, connect to your PostgreSQL database and run the migrations:
+
+   ```
+   npx prisma migrate deploy
+   ```
+
+   Alternatively, you can add this command to your build script in `package.json`:
+
+   ```json
+   "build": "prisma migrate deploy && next build"
+   ```
+
+7. **Seed the database (optional)**
+
+   If you want to seed your database with initial data, you can run:
+
+   ```
+   npm run seed
+   ```
+
+## Local Development
+
+1. Clone the repository
+   ```
+   git clone https://github.com/yourusername/apsrtc-bus-ticketing.git
+   cd apsrtc-bus-ticketing
+   ```
+
+2. Install dependencies
+   ```
+   npm install
+   ```
+
+3. Create a `.env.local` file with your environment variables
+   ```
+   DATABASE_URL="postgresql://username:password@localhost:5432/apsrtc?schema=public"
+   NEXTAUTH_SECRET="development-secret-key"
+   NEXTAUTH_URL="http://localhost:3000"
+   ```
+
+4. Run migrations and generate Prisma client
+   ```
+   npx prisma migrate dev
+   ```
+
+5. Start the development server
+   ```
+   npm run dev
+   ```
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

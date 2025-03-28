@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# environment variables
+.env
+.env*.local
+.vercel
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Prisma
+.prisma/client/
