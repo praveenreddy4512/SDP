@@ -6,22 +6,47 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio",
+    "seed": "node prisma/seed.js",
+    "setup-db": "npx ts-node src/lib/reset-db.ts"
   },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.8.0",
+    "@prisma/client": "^6.5.0",
+    "@tanstack/react-query": "^5.69.0",
+    "bcrypt": "^5.1.1",
+    "chart.js": "^4.4.1",
+    "date-fns": "^4.1.0",
+    "dexie": "^4.0.11",
+    "js-cookie": "^3.0.5",
+    "next": "15.2.4",
+    "next-auth": "^4.24.11",
+    "print-js": "^1.6.0",
+    "prisma": "^6.5.0",
+    "qrcode": "^1.5.4",
     "react": "^19.0.0",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^19.0.0",
-    "next": "15.2.4"
+    "react-print": "^1.3.1",
+    "react-to-print": "^3.0.5",
+    "recharts": "^2.15.1"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/bcrypt": "^5.0.2",
+    "@types/js-cookie": "^3.0.6",
     "@types/node": "^20",
+    "@types/qrcode": "^1.5.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
     "eslint": "^9",
     "eslint-config-next": "15.2.4",
-    "@eslint/eslintrc": "^3"
+    "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5"
   }
 }

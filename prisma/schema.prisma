@@ -1,0 +1,219 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for vendors and admins
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  password      String
+  role          UserRole
+  vendorProfile Vendor?  @relation("UserToVendor")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+enum UserRole {
+  ADMIN
+  VENDOR
+  USER
+}
+
+// Route model for bus routes
+model Route {
+  id          String     @id @default(cuid())
+  name        String
+  source      String
+  destination String
+  distance    Float
+  basePrice   Float
+  buses       Bus[]
+  machines    Machine[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([source, destination])
+}
+
+// Bus model for buses
+model Bus {
+  id          String   @id @default(cuid())
+  busNumber   String   @unique
+  routeId     String
+  route       Route    @relation(fields: [routeId], references: [id])
+  totalSeats  Int
+  busType     BusType
+  amenities   String[]
+  vendorId    String
+  vendor      Vendor   @relation(fields: [vendorId], references: [id])
+  trips       Trip[]
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([routeId])
+  @@index([vendorId])
+}
+
+enum BusType {
+  AC
+  NON_AC
+  SLEEPER
+  SEATER
+  AC_SLEEPER
+  AC_SEATER
+}
+
+// Vendor model for bus operators
+model Vendor {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  phone     String?
+  address   String?
+  user      User     @relation("UserToVendor", fields: [userId], references: [id])
+  userId    String   @unique
+  buses     Bus[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Trip model for scheduled bus journeys
+model Trip {
+  id            String     @id @default(cuid())
+  busId         String
+  bus           Bus        @relation(fields: [busId], references: [id])
+  departureTime DateTime
+  arrivalTime   DateTime
+  status        TripStatus @default(SCHEDULED)
+  availableSeats Int
+  tickets       Ticket[]
+  seats         Seat[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@index([busId])
+  @@index([departureTime])
+}
+
+enum TripStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+// Seat model for bus seats
+model Seat {
+  id         String      @id @default(cuid())
+  tripId     String
+  trip       Trip        @relation(fields: [tripId], references: [id])
+  seatNumber Int
+  status     SeatStatus  @default(AVAILABLE)
+  ticketId   String?     @unique
+  ticket     Ticket?     @relation(fields: [ticketId], references: [id])
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@index([tripId])
+  @@unique([tripId, seatNumber])
+}
+
+enum SeatStatus {
+  AVAILABLE
+  BOOKED
+  RESERVED
+  UNAVAILABLE
+}
+
+// Ticket model for booked tickets
+model Ticket {
+  id             String       @id @default(cuid())
+  tripId         String
+  trip           Trip         @relation(fields: [tripId], references: [id])
+  seat           Seat?
+  price          Float
+  status         TicketStatus @default(BOOKED)
+  paymentType    PaymentType
+  paymentStatus  PaymentStatus @default(PENDING)
+  qrCode         String       @unique
+  passengerName  String
+  passengerPhone String
+  machineId      String?
+  machine        Machine?     @relation(fields: [machineId], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([tripId])
+  @@index([machineId])
+}
+
+enum TicketStatus {
+  BOOKED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentType {
+  CASH
+  QR
+}
+
+// Machine model for self-ticketing machines
+model Machine {
+  id          String   @id @default(cuid())
+  name        String
+  location    String
+  routeId     String
+  route       Route    @relation(fields: [routeId], references: [id])
+  isActive    Boolean  @default(true)
+  tickets     Ticket[]
+  lastSyncAt  DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([routeId])
+}
+
+// Transaction model for payment transactions
+model Transaction {
+  id            String          @id @default(cuid())
+  amount        Float
+  type          TransactionType
+  status        TransactionStatus @default(PENDING)
+  ticketId      String
+  paymentMethod PaymentType
+  referenceId   String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+enum TransactionType {
+  PAYMENT
+  REFUND
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
