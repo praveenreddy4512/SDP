@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
         defaultSeats.push({
           tripId,
           seatNumber: i,
-          status: 'AVAILABLE'
+          status: 'AVAILABLE' as any
         });
       }
       
