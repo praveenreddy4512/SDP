@@ -55,6 +55,7 @@
     "@eslint/eslintrc": "^3",
     "@types/bcrypt": "^5.0.2",
     "@types/js-cookie": "^3.0.6",
+    "@types/next": "^8.0.7",
     "@types/node": "^20.17.41",
     "@types/qrcode": "^1.5.5",
     "@types/react": "^19.1.3",
