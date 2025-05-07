@@ -36,10 +36,17 @@ const Select: React.FC<SelectProps> = ({ value, onValueChange, children, classNa
     <div className={className}>
       {React.Children.map(children, child => {
         if (React.isValidElement(child)) {
-          return React.cloneElement(child, {
-            value,
-            onValueChange,
-          });
+          const type = child.type as any;
+          if (
+            (typeof type === 'function' || typeof type === 'object') &&
+            (type.displayName === "SelectTrigger" || type.displayName === "SelectItem")
+          ) {
+            return React.cloneElement(child as React.ReactElement<any>, {
+              value,
+              onValueChange,
+            });
+          }
+          return child;
         }
         return child;
       })}
