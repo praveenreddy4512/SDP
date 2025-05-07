@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+type RouteParams = {
+  machineId: string;
+};
+
 export async function GET(
   request: NextRequest,
-  context: RouteContext
+  { params }: { params: RouteParams }
 ) {
-  const { machineId } = context.params;
+  const { machineId } = params;
   console.log('GET /api/machines/[machineId]/trips - Request received', { machineId });
   
   try {
