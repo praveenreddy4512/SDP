@@ -3,9 +3,9 @@ import prisma from "@/lib/prisma";
 
 export async function GET(
   request: NextRequest,
-  context: { params: { machineId: string } }
+  { params }: { params: { machineId: string } }
 ) {
-  const { machineId } = context.params;
+  const { machineId } = params;
   console.log('GET /api/machines/[machineId]/trips - Request received', { machineId });
   
   try {
