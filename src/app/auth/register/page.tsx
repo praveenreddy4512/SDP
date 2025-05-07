@@ -72,111 +72,111 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <Card className="w-full max-w-md">
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Create an Account</h1>
-          <p className="text-gray-600">Register to start using our bus ticketing system</p>
+    <div className="min-vh-100 d-flex align-items-center justify-content-center bg-light py-5">
+      <div className="w-100" style={{maxWidth: 400}}>
+        <div className="text-center mb-4">
+          <h2 className="h3 fw-bold">Create an Account</h2>
+          <p className="text-muted">Register to start using our bus ticketing system</p>
         </div>
         
-        {error && (
-          <div className="bg-red-50 text-red-600 p-4 rounded-md mb-6">
-            {error}
-          </div>
-        )}
-        
-        {success && (
-          <div className="bg-green-50 text-green-600 p-4 rounded-md mb-6">
-            Registration successful! Redirecting to login page...
-          </div>
-        )}
-        
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-              Full Name
-            </label>
-            <input
-              id="name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter your full name"
-              required
-            />
+        <div className="card p-4 shadow-sm">
+          {error && (
+            <div className="alert alert-danger py-2 text-center mb-3">{error}</div>
+          )}
+          
+          {success && (
+            <div className="alert alert-success py-2 text-center mb-3">
+              Registration successful! Redirecting to login page...
+            </div>
+          )}
+          
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label htmlFor="name" className="form-label">Full Name</label>
+              <input
+                id="name"
+                type="text"
+                className="form-control"
+                placeholder="Enter your full name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+            
+            <div className="mb-3">
+              <label htmlFor="email" className="form-label">Email Address</label>
+              <input
+                id="email"
+                type="email"
+                className="form-control"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label">Password</label>
+              <input
+                id="password"
+                type="password"
+                className="form-control"
+                placeholder="Create a password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            
+            <div className="mb-3">
+              <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
+              <input
+                id="confirmPassword"
+                type="password"
+                className="form-control"
+                placeholder="Confirm your password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+            </div>
+            
+            <div className="d-grid gap-2">
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={isLoading || success}
+              >
+                {isLoading ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Registering...
+                  </>
+                ) : (
+                  'Register'
+                )}
+              </button>
+            </div>
+          </form>
+          
+          <div className="text-center mt-4">
+            <p className="text-muted mb-0">
+              Already have an account?{' '}
+              <Link href="/auth/login" className="text-primary text-decoration-none">
+                Login here
+              </Link>
+            </p>
           </div>
           
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter your email"
-              required
-            />
-          </div>
-          
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Create a password"
-              required
-            />
-          </div>
-          
-          <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-              Confirm Password
-            </label>
-            <input
-              id="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Confirm your password"
-              required
-            />
-          </div>
-          
-          <Button
-            type="submit"
-            fullWidth
-            isLoading={isLoading}
-            disabled={isLoading || success}
-          >
-            Register
-          </Button>
-        </form>
-        
-        <div className="mt-6 text-center text-sm">
-          <p className="text-gray-600">
-            Already have an account?{' '}
-            <Link href="/auth/login" className="text-blue-600 hover:text-blue-800">
-              Login here
+          <div className="text-center mt-3">
+            <Link href="/" className="text-primary text-decoration-none">
+              ← Back to Home
             </Link>
-          </p>
+          </div>
         </div>
-        
-        <div className="mt-4 text-center text-sm">
-          <Link href="/" className="text-blue-600 hover:text-blue-800">
-            ← Back to Home
-          </Link>
-        </div>
-      </Card>
+      </div>
     </div>
   );
 } 

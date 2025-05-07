@@ -33,7 +33,7 @@ interface ValueProps {
 
 const Select: React.FC<SelectProps> = ({ value, onValueChange, children, className = '' }) => {
   return (
-    <div className={`relative ${className}`}>
+    <div className={className}>
       {React.Children.map(children, child => {
         if (React.isValidElement(child)) {
           return React.cloneElement(child, {
@@ -72,22 +72,18 @@ const SelectTrigger: React.FC<TriggerProps> = ({ children, className = '', id })
 };
 
 const SelectValue: React.FC<ValueProps> = ({ placeholder, className = '' }) => {
-  return <span className={`block truncate ${className}`}>{placeholder}</span>;
+  return <span className={className}>{placeholder}</span>;
 };
 
 const SelectContent: React.FC<ContentProps> = ({ children, className = '' }) => {
-  return (
-    <div className={`absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto ${className}`}>
-      <div className="py-1">{children}</div>
-    </div>
-  );
+  return <div className={className}>{children}</div>;
 };
 
 const SelectItem: React.FC<ItemProps> & { displayName?: string } = ({ value, children, className = '' }) => {
   return (
     <div
       data-value={value}
-      className={`px-4 py-2 cursor-pointer hover:bg-gray-100 ${className}`}
+      className={className}
     >
       {children}
     </div>

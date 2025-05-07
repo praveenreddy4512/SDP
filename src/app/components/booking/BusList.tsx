@@ -2,7 +2,6 @@ import React from 'react';
 import { format } from 'date-fns';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import BusList from '@/components/booking/BusList';
 
 interface Bus {
   id: string;
@@ -38,6 +37,12 @@ const BusList: React.FC<BusListProps> = ({ trips, onSelectTrip, isLoading = fals
   // Helper function to calculate duration
   const calculateDuration = (departureTime: string | Date, arrivalTime: string | Date) => {
     const departureDate = typeof departureTime === 'string' ? new Date(departureTime) : departureTime;
+    
+    // Handle missing arrival time
+    if (!arrivalTime) {
+      return 'N/A';
+    }
+    
     const arrivalDate = typeof arrivalTime === 'string' ? new Date(arrivalTime) : arrivalTime;
     
     const durationMs = arrivalDate.getTime() - departureDate.getTime();
@@ -116,7 +121,7 @@ const BusList: React.FC<BusListProps> = ({ trips, onSelectTrip, isLoading = fals
                 </div>
                 
                 <div className="text-right">
-                  <p className="text-lg font-semibold text-gray-900">{formatTime(trip.arrivalTime)}</p>
+                  <p className="text-lg font-semibold text-gray-900">{trip.arrivalTime ? formatTime(trip.arrivalTime) : 'N/A'}</p>
                   <p className="text-xs text-gray-500">Arrival</p>
                 </div>
               </div>

@@ -3,6 +3,14 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { HomeIcon, UsersIcon, CalendarIcon, ChartBarIcon } from '@heroicons/react/24/outline';
+
+const navigation = [
+  { name: 'Dashboard', href: '/admin', icon: HomeIcon },
+  { name: 'Events', href: '/admin/events', icon: CalendarIcon },
+  { name: 'Users', href: '/admin/users', icon: UsersIcon },
+  { name: 'Analytics', href: '/admin/analytics', icon: ChartBarIcon },
+];
 
 export default function AdminSidebar() {
   const pathname = usePathname();
@@ -25,31 +33,28 @@ export default function AdminSidebar() {
     <div className="flex h-0 flex-1 flex-col overflow-y-auto bg-white">
       <nav className="mt-6 px-3">
         <div className="space-y-1">
-          {navItems.map((item) => (
-            <Link
-              key={item.name}
-              href={item.path}
-              className={`group flex items-center rounded-md px-3 py-2 text-sm font-medium ${
-                isActive(item.path)
-                  ? 'bg-green-50 text-green-700'
-                  : 'text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className={`mr-3 h-5 w-5 flex-shrink-0 ${
-                  isActive(item.path) ? 'text-green-600' : 'text-gray-400 group-hover:text-gray-500'
+          {navigation.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`group flex items-center rounded-md px-3 py-2 text-sm font-medium ${
+                  isActive
+                    ? 'bg-blue-100 text-blue-600'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.5}
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
-              </svg>
-              {item.name}
-            </Link>
-          ))}
+                <item.icon
+                  className={`mr-3 h-5 w-5 flex-shrink-0 ${
+                    isActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-500'
+                  }`}
+                  aria-hidden="true"
+                />
+                {item.name}
+              </Link>
+            );
+          })}
         </div>
       </nav>
     </div>

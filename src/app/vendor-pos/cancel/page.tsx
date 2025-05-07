@@ -188,21 +188,22 @@ export default function TicketCancellationPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
-      <header className="bg-red-600 text-white shadow-md">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-2 md:space-y-0">
-            <div className="flex items-center">
-              <Logo size="medium" color="light" className="mr-4" customLogo={customLogo} />
-              <h1 className="text-xl md:text-2xl font-bold">APSRTC Vendor POS - Ticket Cancellation</h1>
+    <div className="min-vh-100 bg-light d-flex flex-column">
+      <header className="bg-danger text-white shadow-sm">
+        <div className="container py-3">
+          <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
+            <div className="d-flex align-items-center gap-3">
+              <Logo size="medium" color="light" className="me-3" customLogo={customLogo} />
+              <h1 className="h4 fw-bold mb-0">APSRTC Vendor POS - Ticket Cancellation</h1>
             </div>
             {session?.user && (
-              <div className="flex items-center">
-                <span className="mr-4 text-sm md:text-base">Welcome, {session.user.name}</span>
+              <div className="d-flex align-items-center gap-3">
+                <span className="small">Welcome, {session.user.name}</span>
                 <Button 
                   variant="secondary" 
                   size="sm"
                   onClick={handleBackToVendorDashboard}
+                  className="btn btn-outline-light btn-sm"
                 >
                   Back to Dashboard
                 </Button>
@@ -211,210 +212,130 @@ export default function TicketCancellationPage() {
           </div>
         </div>
       </header>
-      
-      <main className="flex-1 container mx-auto px-4 py-4 md:py-8">
+      <main className="container flex-grow-1 py-4 py-md-5">
         {status === 'loading' ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
+          <div className="d-flex justify-content-center align-items-center" style={{ minHeight: 300 }}>
+            <div className="spinner-border text-danger" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
           </div>
         ) : (
-          <Card className="w-full max-w-4xl mx-auto shadow-md">
-            <CardContent>
-              <div className="mb-4 md:mb-6">
-                <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Ticket Cancellation</h1>
-                <p className="text-gray-800">Search and cancel tickets</p>
-              </div>
-              
+          <div className="card shadow-sm mx-auto" style={{ maxWidth: 700 }}>
+            <div className="card-body">
+              <h2 className="h5 fw-bold mb-3">Ticket Cancellation</h2>
+              <p className="text-muted mb-4">Search and cancel tickets</p>
               {error && (
-                <div className="bg-red-50 text-red-600 p-3 md:p-4 rounded-md mb-4 md:mb-6">
-                  {error}
-                </div>
+                <div className="alert alert-danger text-center mb-4">{error}</div>
               )}
-              
               {success && (
-                <div className="bg-green-50 text-green-600 p-3 md:p-4 rounded-md mb-4 md:mb-6">
-                  {success}
-                </div>
+                <div className="alert alert-success text-center mb-4">{success}</div>
               )}
-              
-              <div className="mb-6">
-                <div className="flex flex-wrap gap-2 mb-4">
+              <div className="mb-4">
+                <div className="btn-group w-100 mb-3" role="group">
                   <button
                     type="button"
                     onClick={() => setSearchMode('phone')}
-                    className={`px-4 py-2 rounded-md ${
-                      searchMode === 'phone' 
-                        ? 'bg-red-600 text-white' 
-                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    }`}
+                    className={`btn ${searchMode === 'phone' ? 'btn-danger' : 'btn-outline-secondary'}`}
                   >
-                    <span className="flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                      </svg>
-                      Search by Phone
-                    </span>
+                    <i className="bi bi-telephone me-1"></i>Search by Phone
                   </button>
                   <button
                     type="button"
                     onClick={() => setSearchMode('id')}
-                    className={`px-4 py-2 rounded-md ${
-                      searchMode === 'id' 
-                        ? 'bg-red-600 text-white' 
-                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    }`}
+                    className={`btn ${searchMode === 'id' ? 'btn-danger' : 'btn-outline-secondary'}`}
                   >
-                    <span className="flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M10 2a5 5 0 00-5 5v2a2 2 0 00-2 2v5a2 2 0 002 2h10a2 2 0 002-2v-5a2 2 0 00-2-2H7V7a3 3 0 015.905-.75 1 1 0 001.937-.5A5.002 5.002 0 0010 2z" />
-                      </svg>
-                      Search by Ticket ID
-                    </span>
+                    <i className="bi bi-upc-scan me-1"></i>Search by Ticket ID
                   </button>
                 </div>
-                
-                <form onSubmit={handleSearch} className="space-y-4">
-                  {searchMode === 'phone' ? (
-                    <div>
-                      <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-1">
-                        Phone Number
-                      </label>
-                      <div className="flex flex-col md:flex-row gap-3">
+                <form onSubmit={handleSearch}>
+                  <div className="row g-3 align-items-end">
+                    {searchMode === 'phone' ? (
+                      <div className="col-12 col-md-8">
+                        <label htmlFor="phoneNumber" className="form-label">Phone Number</label>
                         <input
                           id="phoneNumber"
                           type="tel"
                           value={phoneNumber}
                           onChange={(e) => setPhoneNumber(e.target.value)}
-                          className="flex-1 p-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500"
+                          className="form-control"
                           placeholder="Enter passenger phone number"
                           required
                         />
-                        <Button
-                          type="submit"
-                          className="bg-red-600 hover:bg-red-700 text-white"
-                          disabled={isLoading}
-                        >
-                          {isLoading ? (
-                            <div className="flex items-center">
-                              <div className="animate-spin h-5 w-5 mr-2 border-2 border-t-transparent border-white rounded-full"></div>
-                              <span>Searching...</span>
-                            </div>
-                          ) : (
-                            <span className="flex items-center">
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-                              </svg>
-                              Search
-                            </span>
-                          )}
-                        </Button>
                       </div>
-                    </div>
-                  ) : (
-                    <div>
-                      <label htmlFor="ticketId" className="block text-sm font-medium text-gray-700 mb-1">
-                        Ticket ID
-                      </label>
-                      <div className="flex flex-col md:flex-row gap-3">
+                    ) : (
+                      <div className="col-12 col-md-8">
+                        <label htmlFor="ticketId" className="form-label">Ticket ID</label>
                         <input
                           id="ticketId"
                           type="text"
                           value={ticketId}
                           onChange={(e) => setTicketId(e.target.value)}
-                          className="flex-1 p-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500"
+                          className="form-control"
                           placeholder="Enter ticket ID"
                           required
                         />
-                        <Button
-                          type="submit"
-                          className="bg-red-600 hover:bg-red-700 text-white"
-                          disabled={isLoading}
-                        >
-                          {isLoading ? (
-                            <div className="flex items-center">
-                              <div className="animate-spin h-5 w-5 mr-2 border-2 border-t-transparent border-white rounded-full"></div>
-                              <span>Searching...</span>
-                            </div>
-                          ) : (
-                            <span className="flex items-center">
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-                              </svg>
-                              Search
-                            </span>
-                          )}
-                        </Button>
                       </div>
+                    )}
+                    <div className="col-12 col-md-4 d-grid">
+                      <Button
+                        type="submit"
+                        className="btn btn-danger btn-lg"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? (
+                          <span><span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Searching...</span>
+                        ) : (
+                          <span><i className="bi bi-search me-1"></i>Search</span>
+                        )}
+                      </Button>
                     </div>
-                  )}
+                  </div>
                 </form>
               </div>
-              
               {tickets.length > 0 && (
-                <div className="mt-6">
-                  <h2 className="text-lg font-semibold mb-3 text-gray-900">Search Results</h2>
-                  <div className="overflow-x-auto bg-white rounded-lg border border-gray-200">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
+                <div className="mt-4">
+                  <h2 className="h6 fw-bold mb-3 text-dark">Search Results</h2>
+                  <div className="table-responsive rounded border">
+                    <table className="table table-hover align-middle mb-0">
+                      <thead className="table-light">
                         <tr>
-                          <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Passenger
-                          </th>
-                          <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Trip Details
-                          </th>
-                          <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Status
-                          </th>
-                          <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Action
-                          </th>
+                          <th>Passenger</th>
+                          <th>Trip Details</th>
+                          <th>Status</th>
+                          <th>Action</th>
                         </tr>
                       </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
+                      <tbody>
                         {tickets.map((ticket) => (
-                          <tr 
-                            key={ticket.id} 
-                            className={`${selectedTicket === ticket.id ? 'bg-red-50' : 'hover:bg-gray-50'} cursor-pointer`}
+                          <tr
+                            key={ticket.id}
+                            className={selectedTicket === ticket.id ? 'table-danger' : ''}
                             onClick={() => ticket.status === 'BOOKED' && setSelectedTicket(ticket.id)}
+                            style={{ cursor: ticket.status === 'BOOKED' ? 'pointer' : 'default' }}
                           >
-                            <td className="px-4 py-4 whitespace-nowrap">
-                              <div className="flex flex-col">
-                                <div className="text-sm font-medium text-gray-900">{ticket.passengerName}</div>
-                                <div className="text-sm text-gray-500">{ticket.passengerPhone}</div>
-                              </div>
+                            <td>
+                              <div className="fw-semibold">{ticket.passengerName}</div>
+                              <div className="text-muted small">{ticket.passengerPhone}</div>
                             </td>
-                            <td className="px-4 py-4">
-                              <div className="text-sm text-gray-900">{ticket.trip.bus.route.source} to {ticket.trip.bus.route.destination}</div>
-                              <div className="text-sm text-gray-500">
-                                Bus: {ticket.trip.bus.busNumber}, Seat: {ticket.seat?.seatNumber || 'N/A'}
-                              </div>
-                              <div className="text-xs text-gray-500">{formatDate(ticket.trip.departureTime)}</div>
+                            <td>
+                              <div>{ticket.trip.bus.route.source} to {ticket.trip.bus.route.destination}</div>
+                              <div className="text-muted small">Bus: {ticket.trip.bus.busNumber}, Seat: {ticket.seat?.seatNumber || 'N/A'}</div>
+                              <div className="text-muted small">{formatDate(ticket.trip.departureTime)}</div>
                             </td>
-                            <td className="px-4 py-4 whitespace-nowrap">
-                              <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                ${ticket.status === 'BOOKED' ? 'bg-green-100 text-green-800' : 
-                                  ticket.status === 'CANCELLED' ? 'bg-red-100 text-red-800' : 
-                                  'bg-yellow-100 text-yellow-800'}`}
-                              >
-                                {ticket.status}
-                              </span>
+                            <td>
+                              <span className={`badge rounded-pill px-3 py-2 fw-normal ${ticket.status === 'BOOKED' ? 'bg-success-subtle text-success' : ticket.status === 'CANCELLED' ? 'bg-danger-subtle text-danger' : 'bg-warning-subtle text-warning'}`}>{ticket.status}</span>
                             </td>
-                            <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                            <td>
                               {ticket.status === 'BOOKED' ? (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedTicket(ticket.id);
-                                    handleCancelTicket();
-                                  }}
-                                  className="text-red-600 hover:text-red-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                                <Button
+                                  onClick={e => { e.stopPropagation(); setSelectedTicket(ticket.id); handleCancelTicket(); }}
+                                  className="btn btn-link text-danger p-0"
                                   disabled={isLoading}
                                 >
                                   Cancel
-                                </button>
+                                </Button>
                               ) : (
-                                <span className="text-gray-400">No Actions</span>
+                                <span className="text-muted small">No Actions</span>
                               )}
                             </td>
                           </tr>
@@ -422,32 +343,29 @@ export default function TicketCancellationPage() {
                       </tbody>
                     </table>
                   </div>
-                  
                   {selectedTicket && (
-                    <div className="mt-6 bg-red-50 p-4 rounded-lg border border-red-100">
-                      <h3 className="font-semibold text-red-800 mb-2">Confirm Cancellation</h3>
-                      <p className="text-sm text-red-600 mb-4">
-                        Are you sure you want to cancel the selected ticket? This action cannot be undone.
-                      </p>
-                      <div className="flex justify-end space-x-3">
+                    <div className="mt-4 alert alert-danger d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                      <div>
+                        <h6 className="fw-bold mb-1">Confirm Cancellation</h6>
+                        <p className="mb-0">Are you sure you want to cancel the selected ticket? This action cannot be undone.</p>
+                      </div>
+                      <div className="d-flex gap-2 mt-3 mt-md-0">
                         <Button
                           variant="secondary"
                           size="sm"
                           onClick={() => setSelectedTicket(null)}
+                          className="btn btn-outline-secondary btn-sm"
                         >
                           Cancel
                         </Button>
                         <Button
-                          className="bg-red-600 hover:bg-red-700 text-white"
+                          className="btn btn-danger btn-sm"
                           size="sm"
                           onClick={handleCancelTicket}
                           disabled={isLoading}
                         >
                           {isLoading ? (
-                            <div className="flex items-center">
-                              <div className="animate-spin h-4 w-4 mr-2 border-2 border-t-transparent border-white rounded-full"></div>
-                              <span>Processing...</span>
-                            </div>
+                            <span><span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Processing...</span>
                           ) : (
                             'Confirm Cancellation'
                           )}
@@ -457,8 +375,8 @@ export default function TicketCancellationPage() {
                   )}
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
       </main>
     </div>

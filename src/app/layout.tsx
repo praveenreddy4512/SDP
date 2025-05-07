@@ -1,20 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import Navigation from "@/components/Navigation";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
+// import "./globals.css";
 import { SessionProvider } from "@/components/SessionProvider";
 import { Inter } from "next/font/google";
 import { ToastProvider } from "@/components/ui/toast";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import Navbar from '@/components/Navbar';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,12 +21,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased ${inter.className}`}
-      >
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+      <body className={`${GeistSans.className} antialiased`}>
         <SessionProvider>
-          <Navigation />
+          <Navbar />
           <ToastProvider>
             {children}
           </ToastProvider>

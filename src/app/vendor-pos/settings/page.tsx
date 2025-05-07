@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -16,6 +16,22 @@ export default function VendorSettingsPage() {
   const [companyName, setCompanyName] = useState<string>('APSRTC');
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  
+  // Example state (replace with real data/fetching as needed)
+  const [profile, setProfile] = useState({
+    name: "Vendor User",
+    email: "vendor@buspos.com",
+    phone: "9876543210",
+  });
+  const [pos, setPOS] = useState({
+    defaultPayment: "cash",
+    printReceipt: true,
+    language: "en",
+  });
+  const [machine, setMachine] = useState({
+    machineName: "POS-001",
+    location: "Main Bus Stand",
+  });
   
   // Check if user is logged in
   useEffect(() => {
@@ -80,143 +96,136 @@ export default function VendorSettingsPage() {
     router.push('/vendor-pos');
   };
 
+  // Handlers (replace with real API calls)
+  const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setProfile({ ...profile, [e.target.name]: e.target.value });
+  };
+  const handlePOSChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    if (type === "checkbox" && e.target instanceof HTMLInputElement) {
+      setPOS({ ...pos, [name]: e.target.checked });
+    } else {
+      setPOS({ ...pos, [name]: value });
+    }
+  };
+  const handleMachineChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMachine({ ...machine, [e.target.name]: e.target.value });
+  };
+
+  const handleProfileSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    // TODO: Save profile to backend
+    alert("Profile updated!");
+  };
+
+  const handlePOSSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    // TODO: Save POS settings to backend
+    alert("POS settings updated!");
+  };
+
+  const handleMachineSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    // TODO: Save machine settings to backend
+    alert("Machine settings updated!");
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
-      <header className="bg-green-600 text-white shadow-md">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-2 md:space-y-0">
-            <div className="flex items-center">
-              <Logo size="medium" color="light" className="mr-4" customLogo={customLogo} />
-              <h1 className="text-xl md:text-2xl font-bold">APSRTC Vendor POS - Settings</h1>
-            </div>
-            {session?.user && (
-              <div className="flex items-center">
-                <span className="mr-4 text-sm md:text-base">Welcome, {session.user.name}</span>
-                <Button 
-                  variant="secondary" 
-                  size="sm"
-                  onClick={handleBackToVendorDashboard}
-                >
-                  Back to Dashboard
-                </Button>
-              </div>
-            )}
+    <div className="min-vh-100 bg-light d-flex flex-column">
+      <header className="bg-success text-white shadow">
+        <div className="container py-4 d-flex flex-column flex-md-row justify-content-between align-items-center">
+          <div className="d-flex align-items-center">
+            <Logo size="medium" color="light" className="me-3" customLogo={customLogo} />
+            <h1 className="h4 mb-0">APSRTC Vendor POS - Settings</h1>
           </div>
+          {session?.user && (
+            <div className="d-flex align-items-center">
+              <span className="me-3 small">Welcome, {session.user.name}</span>
+              <Button variant="secondary" size="sm" onClick={handleBackToVendorDashboard}>
+                Back to Dashboard
+              </Button>
+            </div>
+          )}
         </div>
       </header>
-      
-      <main className="flex-1 container mx-auto px-4 py-4 md:py-8">
+      <main className="flex-grow-1 container py-4">
         {status === 'loading' ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+          <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '300px' }}>
+            <div className="spinner-border text-success" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="md:col-span-1">
-              <Card className="shadow-md sticky top-6">
-                <CardContent>
-                  <nav className="space-y-1">
-                    <a 
-                      href="#branding" 
-                      className="block py-2 px-3 text-gray-900 rounded-md bg-gray-100 font-medium"
-                    >
-                      Branding
-                    </a>
-                    <a 
-                      href="#preview" 
-                      className="block py-2 px-3 text-gray-600 hover:bg-gray-50 rounded-md"
-                    >
-                      Preview
-                    </a>
+          <div className="row g-4">
+            <div className="col-12 col-md-4">
+              <div className="card shadow sticky-top" style={{ top: '6rem' }}>
+                <div className="card-body">
+                  <nav className="nav flex-column">
+                    <a href="#branding" className="nav-link active">Branding</a>
+                    <a href="#preview" className="nav-link">Preview</a>
                   </nav>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
-            
-            <div className="md:col-span-2 space-y-6">
-              <div id="branding">
-                <Card className="shadow-md">
-                  <CardContent>
-                    <h2 className="text-xl font-bold text-gray-900 mb-4">Branding Settings</h2>
-                    
+            <div className="col-12 col-md-8">
+              <div id="branding" className="mb-4">
+                <div className="card shadow">
+                  <div className="card-body">
+                    <h2 className="h5 mb-4">Branding Settings</h2>
                     {saveSuccess && (
-                      <div className="mb-4 bg-green-50 text-green-600 p-3 rounded-md">
+                      <div className="alert alert-success mb-4" role="alert">
                         Settings saved successfully!
                       </div>
                     )}
-                    
-                    <div className="space-y-6">
-                      <div>
-                        <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-1">
-                          Company Name
-                        </label>
-                        <input
-                          id="companyName"
-                          type="text"
-                          value={companyName}
-                          onChange={handleCompanyNameChange}
-                          className="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
-                          placeholder="Enter company name"
-                        />
-                      </div>
-                      
-                      <LogoUploader 
-                        currentLogo={customLogo}
-                        onLogoChange={handleLogoChange}
+                    <div className="mb-3">
+                      <label htmlFor="companyName" className="form-label">Company Name</label>
+                      <input
+                        id="companyName"
+                        type="text"
+                        value={companyName}
+                        onChange={handleCompanyNameChange}
+                        className="form-control"
+                        placeholder="Enter company name"
                       />
-                      
-                      <div className="pt-4">
-                        <Button
-                          onClick={handleSaveSettings}
-                          className="bg-green-600 hover:bg-green-700 text-white"
-                          disabled={isSaving}
-                        >
-                          {isSaving ? (
-                            <div className="flex items-center">
-                              <div className="animate-spin h-5 w-5 mr-2 border-2 border-t-transparent border-white rounded-full"></div>
-                              <span>Saving...</span>
-                            </div>
-                          ) : (
-                            'Save Settings'
-                          )}
-                        </Button>
-                      </div>
                     </div>
-                  </CardContent>
-                </Card>
+                    <div className="mb-3">
+                      <LogoUploader currentLogo={customLogo} onLogoChange={handleLogoChange} />
+                    </div>
+                    <Button
+                      onClick={handleSaveSettings}
+                      className="btn btn-success"
+                      disabled={isSaving}
+                    >
+                      {isSaving ? (
+                        <span><span className="spinner-border spinner-border-sm me-2"></span>Saving...</span>
+                      ) : (
+                        'Save Settings'
+                      )}
+                    </Button>
+                  </div>
+                </div>
               </div>
-              
               <div id="preview">
-                <Card className="shadow-md">
-                  <CardContent>
-                    <h2 className="text-xl font-bold text-gray-900 mb-4">Preview</h2>
-                    
-                    <div className="space-y-6">
-                      <div className="p-4 border border-gray-200 rounded-lg">
-                        <h3 className="text-sm font-medium text-gray-500 mb-2">Header Preview</h3>
-                        <div className="bg-green-600 text-white p-4 rounded-md">
-                          <div className="flex items-center">
-                            <Logo size="small" color="light" customLogo={customLogo} />
-                            <span className="ml-2 font-bold">{companyName || 'APSRTC'}</span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="p-4 border border-gray-200 rounded-lg">
-                        <h3 className="text-sm font-medium text-gray-500 mb-2">Ticket Preview</h3>
-                        <div className="border border-gray-200 p-4 rounded-md">
-                          <div className="flex justify-center mb-2">
-                            <Logo size="small" customLogo={customLogo} />
-                          </div>
-                          <div className="text-center">
-                            <h4 className="text-lg font-bold">{companyName || 'APSRTC'}</h4>
-                            <p className="text-gray-500 text-sm">Sample Ticket</p>
-                          </div>
-                        </div>
+                <div className="card shadow">
+                  <div className="card-body">
+                    <h2 className="h5 mb-4">Preview</h2>
+                    <div className="mb-4 p-3 border rounded bg-success text-white">
+                      <div className="d-flex align-items-center">
+                        <Logo size="small" color="light" customLogo={customLogo} />
+                        <span className="ms-2 fw-bold">{companyName || 'APSRTC'}</span>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+                    <div className="mb-4 p-3 border rounded">
+                      <div className="text-center mb-2">
+                        <Logo size="small" customLogo={customLogo} />
+                      </div>
+                      <div className="text-center">
+                        <h4 className="h6 fw-bold mb-1">{companyName || 'APSRTC'}</h4>
+                        <p className="text-muted small mb-0">Sample Ticket</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

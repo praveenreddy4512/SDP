@@ -252,348 +252,228 @@ export default function VendorPOSPage() {
   };
   
   // Render login screen
-  const renderLoginScreen = () => {
-    return (
-      <Card className="w-full max-w-md mx-auto shadow-lg">
-        <CardContent>
-          <div className="text-center mb-6">
-            <div className="flex justify-center mb-4">
-              <Logo size="large" customLogo={customLogo} />
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900">APSRTC Vendor POS Login</h1>
-            <p className="text-gray-700">Login to access vendor features</p>
-          </div>
-          
-          {loginError && (
-            <div className="bg-red-50 text-red-600 p-4 rounded-md mb-6">
-              {loginError}
-            </div>
+  const renderLoginScreen = () => (
+    <div className="min-vh-100 d-flex align-items-center justify-content-center bg-light py-5">
+      <div className="w-100" style={{ maxWidth: 400 }}>
+        <div className="text-center mb-4">
+          {customLogo ? (
+            <img src={customLogo} alt="Company Logo" className="img-fluid mb-3" style={{ maxHeight: '80px' }} />
+          ) : (
+            <Logo className="mb-3" />
           )}
-          
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email Address
-              </label>
+          <h2 className="h4 fw-bold mb-2">{companyName} Vendor Portal</h2>
+          <p className="text-muted mb-0">Sign in to manage bus arrivals and tickets</p>
+        </div>
+        <div className="card p-4 shadow-sm">
+          <form onSubmit={handleLogin}>
+            <div className="form-floating mb-3">
               <input
-                id="email"
                 type="email"
+                className="form-control"
+                id="loginEmail"
+                placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
-                placeholder="Enter your email"
                 required
               />
+              <label htmlFor="loginEmail">Email</label>
             </div>
-            
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
+            <div className="form-floating mb-3">
               <input
-                id="password"
                 type="password"
+                className="form-control"
+                id="loginPassword"
+                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
-                placeholder="Enter your password"
                 required
               />
+              <label htmlFor="loginPassword">Password</label>
             </div>
-            
-            <Button
-              type="submit"
-              className="w-full bg-green-600 hover:bg-green-700 text-white"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <div className="flex items-center justify-center">
-                  <div className="animate-spin h-5 w-5 mr-2 border-2 border-t-transparent border-white rounded-full"></div>
-                  <span>Logging in...</span>
-                </div>
-              ) : (
-                'Login to Vendor Portal'
-              )}
-            </Button>
+            {loginError && (
+              <div className="alert alert-danger py-2 text-center mb-3">{loginError}</div>
+            )}
+            <div className="d-grid">
+              <button
+                type="submit"
+                className="btn btn-success btn-lg"
+                disabled={isLoading}
+              >
+                {isLoading ? <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> : null}
+                Login
+              </button>
+            </div>
           </form>
-        </CardContent>
-      </Card>
-    );
-  };
+        </div>
+      </div>
+    </div>
+  );
   
   // Render bus arrival screen
-  const renderBusArrivalScreen = () => {
-    return (
-      <div className="container mx-auto px-4 py-4 md:py-8">
-        <div className="bg-green-600 text-white rounded-lg shadow-md p-4 mb-6">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-            <h1 className="text-xl md:text-2xl font-bold">
-              Welcome, {session?.user?.name || 'Vendor'}!
-            </h1>
-            <div className="mt-3 md:mt-0 flex flex-wrap gap-2">
-              <button 
-                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center"
+  const renderBusArrivalScreen = () => (
+    <div className="container py-4">
+      <div className="row mb-4">
+        <div className="col-12">
+          <div className="card shadow-sm border-success">
+            <div className="card-body">
+              <h2 className="h5 fw-bold mb-3 text-success"><i className="bi bi-bus-front me-2"></i>Log Bus Arrival</h2>
+              <form onSubmit={handleLogBusArrival}>
+                <div className="row g-3">
+                  <div className="col-md-6">
+                    <label htmlFor="route" className="form-label">Route</label>
+                    <select
+                      id="route"
+                      className="form-select"
+                      value={selectedRoute}
+                      onChange={handleRouteChange}
+                      required
+                    >
+                      <option value="">Select Route</option>
+                      {routes.map((route) => (
+                        <option key={route.id} value={route.id}>
+                          {route.name} ({route.source} - {route.destination})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="col-md-6">
+                    <label htmlFor="bus" className="form-label">Bus</label>
+                    <select
+                      id="bus"
+                      className="form-select"
+                      value={selectedBus}
+                      onChange={(e) => setSelectedBus(e.target.value)}
+                      required
+                      disabled={!selectedRoute}
+                    >
+                      <option value="">Select Bus</option>
+                      {buses.map((bus) => (
+                        <option key={bus.id} value={bus.id}>
+                          {bus.busNumber} ({bus.busType})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="row g-3 mt-1">
+                  <div className="col-md-6">
+                    <label htmlFor="departureTime" className="form-label">Departure Time</label>
+                    <input
+                      type="datetime-local"
+                      id="departureTime"
+                      className="form-control"
+                      value={departureTime}
+                      onChange={(e) => setDepartureTime(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label htmlFor="arrivalTime" className="form-label">Arrival Time</label>
+                    <input
+                      type="datetime-local"
+                      id="arrivalTime"
+                      className="form-control"
+                      value={arrivalTime}
+                      onChange={(e) => setArrivalTime(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+                {error && (
+                  <div className="alert alert-danger text-center mt-3">{error}</div>
+                )}
+                <div className="d-grid mt-4">
+                  <button
+                    type="submit"
+                    className="btn btn-success btn-lg"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> : null}
+                    Log Bus Arrival
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="row g-4">
+        <div className="col-md-6">
+          <div className="card h-100 shadow-sm border-0 border-start border-4 border-success">
+            <div className="card-body d-flex flex-column align-items-center justify-content-center text-center">
+              <div className="mb-3"><i className="bi bi-ticket-perforated fs-1 text-success"></i></div>
+              <h3 className="h5 fw-bold mb-2">Ticket Booking</h3>
+              <p className="text-muted mb-3">Book new tickets for passengers</p>
+              <button
+                className="btn btn-success w-100"
                 onClick={handleTicketBookingClick}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
-                </svg>
-                Book Tickets
-              </button>
-              <button 
-                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center"
-                onClick={handleTicketCancellationClick}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                Cancel Tickets
+                <i className="bi bi-plus-circle me-2"></i>Book Tickets
               </button>
             </div>
           </div>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="shadow-md">
-            <CardContent>
-              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Log Bus Arrival
-              </h2>
-              
-              {error && (
-                <div className="bg-red-50 text-red-600 p-3 rounded-md mb-4">
-                  {error}
-                </div>
-              )}
-              
-              <form onSubmit={handleLogBusArrival} className="space-y-4">
-                <div>
-                  <label htmlFor="route" className="block text-sm font-medium text-gray-700 mb-1">
-                    Route
-                  </label>
-                  <select
-                    id="route"
-                    value={selectedRoute}
-                    onChange={handleRouteChange}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
-                    required
-                  >
-                    <option value="">Select a route</option>
-                    {routes.map((route) => (
-                      <option key={route.id} value={route.id}>
-                        {route.source} to {route.destination} - {route.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                
-                <div>
-                  <label htmlFor="bus" className="block text-sm font-medium text-gray-700 mb-1">
-                    Bus
-                  </label>
-                  <select
-                    id="bus"
-                    value={selectedBus}
-                    onChange={(e) => setSelectedBus(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
-                    disabled={!selectedRoute || buses.length === 0}
-                    required
-                  >
-                    <option value="">Select a bus</option>
-                    {buses.map((bus) => (
-                      <option key={bus.id} value={bus.id}>
-                        {bus.busNumber} - {bus.busType}
-                      </option>
-                    ))}
-                  </select>
-                  {selectedRoute && buses.length === 0 && !isLoading && (
-                    <p className="text-sm text-amber-600 mt-1">No buses available for this route</p>
-                  )}
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="arrivalTime" className="block text-sm font-medium text-gray-700 mb-1">
-                      Arrival Time
-                    </label>
-                    <input
-                      id="arrivalTime"
-                      type="datetime-local"
-                      value={arrivalTime}
-                      onChange={(e) => setArrivalTime(e.target.value)}
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="departureTime" className="block text-sm font-medium text-gray-700 mb-1">
-                      Departure Time
-                    </label>
-                    <input
-                      id="departureTime"
-                      type="datetime-local"
-                      value={departureTime}
-                      onChange={(e) => setDepartureTime(e.target.value)}
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div className="flex justify-end pt-2">
-                  <Button
-                    type="submit"
-                    className="bg-green-600 hover:bg-green-700 text-white"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <div className="flex items-center">
-                        <div className="animate-spin h-5 w-5 mr-2 border-2 border-t-transparent border-white rounded-full"></div>
-                        <span>Processing...</span>
-                      </div>
-                    ) : (
-                      'Log Bus Arrival'
-                    )}
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-          
-          <Card className="shadow-md">
-            <CardContent>
-              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-                Quick Actions
-              </h2>
-              
-              <div className="space-y-4">
-                <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
-                  <h3 className="text-md font-semibold text-blue-800 mb-2">Active Trips Today</h3>
-                  
-                  {isLoading ? (
-                    <div className="animate-pulse flex space-x-4">
-                      <div className="flex-1 space-y-4 py-1">
-                        <div className="h-4 bg-blue-200 rounded w-3/4"></div>
-                        <div className="h-4 bg-blue-200 rounded"></div>
-                        <div className="h-4 bg-blue-200 rounded w-5/6"></div>
-                      </div>
-                    </div>
-                  ) : trips.length > 0 ? (
-                    <div className="space-y-3">
-                      {trips.slice(0, 3).map(trip => (
-                        <div key={trip.id} className="bg-white p-3 rounded border border-blue-100 shadow-sm">
-                          <div className="flex justify-between">
-                            <div>
-                              <p className="font-medium text-gray-900">{trip.bus.route.source} to {trip.bus.route.destination}</p>
-                              <p className="text-sm text-gray-600">Bus: {trip.bus.busNumber} ({trip.bus.busType})</p>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-sm font-medium text-gray-900">{formatDate(trip.departureTime)}</p>
-                              <p className="text-xs text-gray-600">{trip.availableSeats} seats available</p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                      
-                      <div className="text-center mt-4">
-                        <a href="/vendor-pos/tickets" className="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                          View All Trips
-                        </a>
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="text-gray-600">No active trips found.</p>
-                  )}
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div
-                    className="bg-orange-50 border border-orange-100 rounded-lg p-4 flex items-center cursor-pointer hover:shadow-md transition"
-                    onClick={handleTicketBookingClick}
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-orange-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
-                    </svg>
-                    <div>
-                      <h3 className="font-semibold text-orange-800">Book Tickets</h3>
-                      <p className="text-xs text-orange-600">Issue tickets for passengers</p>
-                    </div>
-                  </div>
-                  
-                  <div
-                    className="bg-red-50 border border-red-100 rounded-lg p-4 flex items-center cursor-pointer hover:shadow-md transition"
-                    onClick={handleTicketCancellationClick}
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-red-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    <div>
-                      <h3 className="font-semibold text-red-800">Cancel Tickets</h3>
-                      <p className="text-xs text-red-600">Process ticket cancellations</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="col-md-6">
+          <div className="card h-100 shadow-sm border-0 border-start border-4 border-danger">
+            <div className="card-body d-flex flex-column align-items-center justify-content-center text-center">
+              <div className="mb-3"><i className="bi bi-x-circle fs-1 text-danger"></i></div>
+              <h3 className="h5 fw-bold mb-2">Ticket Cancellation</h3>
+              <p className="text-muted mb-3">Cancel existing tickets</p>
+              <button
+                className="btn btn-danger w-100"
+                onClick={handleTicketCancellationClick}
+              >
+                <i className="bi bi-x-octagon me-2"></i>Cancel Tickets
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-    );
-  };
+    </div>
+  );
   
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-green-600 text-white shadow-md">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-2 md:space-y-0">
-            <div className="flex items-center">
-              <Logo size="medium" color="light" className="mr-4" customLogo={customLogo} />
-              <h1 className="text-xl md:text-2xl font-bold">Vendor POS System</h1>
+    <div className="min-vh-100 bg-light d-flex flex-column">
+      <header className="bg-success text-white shadow-sm">
+        <div className="container py-3">
+          <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
+            <div className="d-flex align-items-center gap-3">
+              <Logo size="medium" color="light" className="me-3" customLogo={customLogo} />
+              <h1 className="h4 fw-bold mb-0">Vendor POS System</h1>
             </div>
             {session?.user && (
-              <div className="flex items-center gap-3">
-                <span className="text-sm md:text-base">Logged in as: {session.user.name}</span>
+              <div className="d-flex align-items-center gap-3">
+                <span className="small">Logged in as: {session.user.name}</span>
                 <a
                   href="/vendor-pos/settings"
-                  className="bg-green-700 text-white hover:bg-green-800 px-3 py-1 rounded-md text-sm font-medium flex items-center"
+                  className="btn btn-outline-light btn-sm"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
-                  </svg>
-                  Settings
+                  <i className="bi bi-gear me-1"></i>Settings
                 </a>
                 <a
-                  href="/api/auth/signout"
-                  className="bg-white text-green-700 hover:bg-gray-100 px-3 py-1 rounded-md text-sm font-medium"
+                  href="/auth/logout"
+                  className="btn btn-light btn-sm text-success border-success"
                 >
-                  Logout
+                  <i className="bi bi-box-arrow-right me-1"></i>Logout
                 </a>
               </div>
             )}
           </div>
         </div>
       </header>
-      
-      <main className="container mx-auto p-4 md:py-8">
-        <div className="flex items-center justify-center min-h-[calc(100vh-6rem)]">
-          {status === 'loading' ? (
-            <div className="flex flex-col items-center justify-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
-              <p className="mt-4 text-gray-600">Loading...</p>
+      <main className="flex-grow-1 d-flex align-items-center justify-content-center">
+        {status === 'loading' ? (
+          <div className="d-flex flex-column align-items-center justify-content-center w-100" style={{ minHeight: 300 }}>
+            <div className="spinner-border text-success mb-3" role="status">
+              <span className="visually-hidden">Loading...</span>
             </div>
-          ) : status === 'unauthenticated' || (session?.user?.role !== 'VENDOR' && session?.user?.role !== 'ADMIN') ? (
-            renderLoginScreen()
-          ) : (
-            renderBusArrivalScreen()
-          )}
-        </div>
+            <p className="text-muted">Loading...</p>
+          </div>
+        ) : status === 'unauthenticated' || (session?.user?.role !== 'VENDOR' && session?.user?.role !== 'ADMIN') ? (
+          renderLoginScreen()
+        ) : (
+          renderBusArrivalScreen()
+        )}
       </main>
     </div>
   );

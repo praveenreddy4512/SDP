@@ -38,14 +38,14 @@ export const Tabs: React.FC<TabsProps> = ({ defaultValue = '', children, classNa
 
   return (
     <TabsContext.Provider value={{ value, onValueChange: setValue }}>
-      <div className={`tabs ${className}`}>{children}</div>
+      <div className={className}>{children}</div>
     </TabsContext.Provider>
   );
 };
 
 export const TabsList: React.FC<TabsListProps> = ({ children, className = '' }) => {
   return (
-    <div className={`flex space-x-1 rounded-lg bg-gray-100 p-1 ${className}`}>
+    <div className={className}>
       {children}
     </div>
   );

@@ -12,93 +12,94 @@ export default function HomePage() {
   const userRole = session?.user?.role;
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <main className="container mx-auto px-4 py-16">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Welcome to APSRTC</h1>
-            <p className="text-xl text-gray-600">Your one-stop solution for comfortable and reliable bus travel</p>
+    <div className="bg-light min-vh-100">
+      <main className="container py-5">
+        <div className="mx-auto" style={{maxWidth: 900}}>
+          <div className="text-center mb-5">
+            <h1 className="display-4 fw-bold mb-3">Welcome to APSRTC</h1>
+            <p className="lead text-secondary">Your one-stop solution for comfortable and reliable bus travel</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            <Card className="p-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Customers</h2>
-              <p className="text-gray-600 mb-6">
-                Browse routes, book tickets, and manage your journeys with ease.
-              </p>
-              <Link href="/search">
-                <Button fullWidth>Search & Book Tickets</Button>
-              </Link>
-            </Card>
-
-            <Card className="p-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Bus Operators</h2>
-              <p className="text-gray-600 mb-6">
-                Manage bus arrivals, ticket sales, and check trip statistics.
-              </p>
-              {isAuthenticated && userRole === 'VENDOR' ? (
-                <Link href="/vendor-pos">
-                  <Button fullWidth>Access Vendor POS</Button>
+          <div className="row g-4 mb-5">
+            <div className="col-md-6">
+              <div className="card p-4 h-100">
+                <h2 className="h4 fw-bold mb-3">Customers</h2>
+                <p className="text-secondary mb-4">
+                  Browse routes, book tickets, and manage your journeys with ease.
+                </p>
+                <Link href="/search" className="d-block">
+                  <button className="btn btn-primary w-100">Search & Book Tickets</button>
                 </Link>
-              ) : (
-                <Link href="/auth/login">
-                  <Button fullWidth>Vendor Login</Button>
-                </Link>
-              )}
-            </Card>
+              </div>
+            </div>
+            <div className="col-md-6">
+              <div className="card p-4 h-100">
+                <h2 className="h4 fw-bold mb-3">Bus Operators</h2>
+                <p className="text-secondary mb-4">
+                  Manage bus arrivals, ticket sales, and check trip statistics.
+                </p>
+                {isAuthenticated && userRole === 'VENDOR' ? (
+                  <Link href="/vendor-pos" className="d-block">
+                    <button className="btn btn-primary w-100">Access Vendor POS</button>
+                  </Link>
+                ) : (
+                  <Link href="/auth/login" className="d-block">
+                    <button className="btn btn-outline-primary w-100">Vendor Login</button>
+                  </Link>
+                )}
+              </div>
+            </div>
           </div>
 
           {isAuthenticated && userRole === 'ADMIN' && (
-            <div className="my-8">
-              <Card className="p-8">
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">Administration</h2>
-                <p className="text-gray-600 mb-6">
+            <div className="mb-4">
+              <div className="card p-4">
+                <h2 className="h4 fw-bold mb-3">Administration</h2>
+                <p className="text-secondary mb-4">
                   Manage routes, buses, vendors, and system configuration.
                 </p>
-                <Link href="/admin">
-                  <Button fullWidth>Access Admin Panel</Button>
+                <Link href="/admin" className="d-block">
+                  <button className="btn btn-danger w-100">Access Admin Panel</button>
                 </Link>
-              </Card>
+              </div>
             </div>
           )}
 
-          <div className="my-8">
-            <Card className="p-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Self-Service Machines</h2>
-              <p className="text-gray-600 mb-6">
+          <div className="mb-4">
+            <div className="card p-4">
+              <h2 className="h4 fw-bold mb-3">Self-Service Machines</h2>
+              <p className="text-secondary mb-4">
                 Book tickets directly from our self-service kiosks at bus stations without needing to create an account.
               </p>
-              <Link href="/machine">
-                <Button fullWidth variant="success">Try Self-Service Experience</Button>
+              <Link href="/machine" className="d-block">
+                <button className="btn btn-success w-100">Try Self-Service Experience</button>
               </Link>
-            </Card>
+            </div>
           </div>
 
-          <div className="mt-12 bg-white rounded-lg shadow-md p-8">
-            <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">How It Works</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl">🔍</span>
+          <div className="mt-5 card p-4">
+            <h2 className="h4 fw-bold text-center mb-4">How It Works</h2>
+            <div className="row g-4">
+              <div className="col-md-4 text-center">
+                <div className="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style={{width: 64, height: 64}}>
+                  <span style={{fontSize: 32}}>🔍</span>
                 </div>
-                <h3 className="font-bold text-lg mb-2">Search</h3>
-                <p className="text-gray-600">Find the perfect bus for your journey</p>
+                <h3 className="fw-bold h6 mb-2">Search</h3>
+                <p className="text-secondary">Find the perfect bus for your journey</p>
               </div>
-              
-              <div className="text-center">
-                <div className="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl">🎫</span>
+              <div className="col-md-4 text-center">
+                <div className="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style={{width: 64, height: 64}}>
+                  <span style={{fontSize: 32}}>🎫</span>
                 </div>
-                <h3 className="font-bold text-lg mb-2">Book</h3>
-                <p className="text-gray-600">Select seats and securely pay online</p>
+                <h3 className="fw-bold h6 mb-2">Book</h3>
+                <p className="text-secondary">Select seats and securely pay online</p>
               </div>
-              
-              <div className="text-center">
-                <div className="bg-purple-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl">🚌</span>
+              <div className="col-md-4 text-center">
+                <div className="bg-purple bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style={{width: 64, height: 64, background: '#f3e8ff'}}>
+                  <span style={{fontSize: 32}}>🚌</span>
                 </div>
-                <h3 className="font-bold text-lg mb-2">Travel</h3>
-                <p className="text-gray-600">Show your ticket and enjoy your journey</p>
+                <h3 className="fw-bold h6 mb-2">Travel</h3>
+                <p className="text-secondary">Show your ticket and enjoy your journey</p>
               </div>
             </div>
           </div>

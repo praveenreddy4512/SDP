@@ -2,57 +2,46 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Card from "@/components/ui/Card";
-import Button from "@/components/ui/Button";
 import { useSession } from "next-auth/react";
+import { format } from "date-fns";
+import { Calendar, Clock, Bus, MapPin, Users, AlertTriangle, DollarSign, TrendingUp, XCircle, CheckCircle } from "lucide-react";
+import Button from "@/components/ui/Button";
 
 interface Trip {
   id: string;
+  bus: {
+    busNumber: string;
+    route: {
+      name: string;
+      source: string;
+      destination: string;
+    };
+  };
   departureTime: string;
   arrivalTime: string;
-  status: string;
-  busId: string;
-  bus?: {
-    busNumber: string;
-    busType: string;
-  };
-  route?: {
-    name: string;
-    source: string;
-    destination: string;
-  };
-}
-
-interface Bus {
-  id: string;
-  busNumber: string;
-  busType: string;
-  routeId: string;
-  route?: {
-    name: string;
-    source: string;
-    destination: string;
+  status: "SCHEDULED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+  availableSeats: number;
+  totalSeats: number;
+  metrics?: {
+    totalPassengers: number;
+    totalRevenue: number;
+    occupancyRate: number;
+    cancelledTickets: number;
+    refundedTickets: number;
+    isOnTime: boolean;
+    averageTicketPrice: number;
   };
 }
 
-export default function TripsManagement() {
+export default function TripsPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const [trips, setTrips] = useState<Trip[]>([]);
-  const [buses, setBuses] = useState<Bus[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({
-    id: "",
-    departureTime: "",
-    arrivalTime: "",
-    status: "SCHEDULED",
-    busId: ""
-  });
-  const [isEditing, setIsEditing] = useState(false);
+  const [upcomingTrips, setUpcomingTrips] = useState<Trip[]>([]);
+  const [historicalTrips, setHistoricalTrips] = useState<Trip[]>([]);
+  const [activeTab, setActiveTab] = useState<"upcoming" | "history">("upcoming");
 
   useEffect(() => {
-    // Check if user is authenticated and is an admin
     if (status === "unauthenticated") {
       router.push("/auth/login?callbackUrl=/admin/trips");
       return;
@@ -64,275 +53,152 @@ export default function TripsManagement() {
     }
     
     loadTrips();
-    loadBuses();
   }, [status, session, router]);
 
   const loadTrips = async () => {
+    setLoading(true);
     try {
-      const response = await fetch('/api/trips');
+      const response = await fetch("/api/admin/trips");
       if (!response.ok) {
-        throw new Error('Failed to fetch trips');
+        throw new Error("Failed to fetch trips");
       }
       const data = await response.json();
-      setTrips(data);
+      const now = new Date();
+      
+      // Split trips into upcoming and historical
+      const upcoming = data.filter((trip: Trip) => new Date(trip.departureTime) > now);
+      const historical = data.filter((trip: Trip) => new Date(trip.departureTime) <= now);
+      
+      setUpcomingTrips(upcoming);
+      setHistoricalTrips(historical);
+    } catch (error) {
+      console.error("Error loading trips:", error);
+    } finally {
       setLoading(false);
-    } catch (error) {
-      console.error('Error loading trips:', error);
-      setLoading(false);
     }
   };
 
-  const loadBuses = async () => {
-    try {
-      const response = await fetch('/api/buses');
-      if (!response.ok) {
-        throw new Error('Failed to fetch buses');
-      }
-      const data = await response.json();
-      setBuses(data);
-    } catch (error) {
-      console.error('Error loading buses:', error);
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "SCHEDULED":
+        return "bg-blue-100 text-blue-800";
+      case "IN_PROGRESS":
+        return "bg-green-100 text-green-800";
+      case "COMPLETED":
+        return "bg-gray-100 text-gray-800";
+      case "CANCELLED":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    try {
-      let response;
-      
-      if (isEditing) {
-        // Update existing trip
-        response = await fetch('/api/trips', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(formData)
-        });
-      } else {
-        // Create new trip
-        response = await fetch('/api/trips', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            departureTime: formData.departureTime,
-            arrivalTime: formData.arrivalTime,
-            status: formData.status,
-            busId: formData.busId
-          })
-        });
-      }
-      
-      if (!response.ok) {
-        throw new Error(`Failed to ${isEditing ? 'update' : 'create'} trip`);
-      }
-      
-      // Reset form and reload trips
-      resetForm();
-      loadTrips();
-    } catch (error) {
-      console.error('Error submitting form:', error);
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "SCHEDULED":
+        return <Calendar className="h-4 w-4" />;
+      case "IN_PROGRESS":
+        return <Clock className="h-4 w-4" />;
+      case "COMPLETED":
+        return <Bus className="h-4 w-4" />;
+      case "CANCELLED":
+        return <AlertTriangle className="h-4 w-4" />;
+      default:
+        return <Bus className="h-4 w-4" />;
     }
-  };
-
-  const handleEdit = (trip: Trip) => {
-    setFormData({
-      id: trip.id,
-      departureTime: formatDateTimeForInput(trip.departureTime),
-      arrivalTime: formatDateTimeForInput(trip.arrivalTime),
-      status: trip.status,
-      busId: trip.busId
-    });
-    setIsEditing(true);
-    setShowForm(true);
-  };
-
-  const resetForm = () => {
-    setFormData({
-      id: "",
-      departureTime: "",
-      arrivalTime: "",
-      status: "SCHEDULED",
-      busId: ""
-    });
-    setIsEditing(false);
-    setShowForm(false);
-  };
-
-  // Helper function to format date-time for input
-  const formatDateTimeForInput = (dateTimeString: string) => {
-    const date = new Date(dateTimeString);
-    return date.toISOString().slice(0, 16);
-  };
-
-  // Helper function to format date-time for display
-  const formatDateTimeForDisplay = (dateTimeString: string) => {
-    const date = new Date(dateTimeString);
-    return date.toLocaleString();
   };
 
   if (loading) {
     return (
-      <div className="container mx-auto py-8 px-4">
-        <div className="flex justify-center items-center h-64">
-          <p className="text-gray-500">Loading...</p>
+      <div className="container py-5">
+        <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '300px' }}>
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Trips Management</h1>
-        <div className="flex gap-2">
-          <Button onClick={() => router.push('/admin')}>Back to Dashboard</Button>
-          {!showForm && (
-            <Button onClick={() => setShowForm(true)}>Schedule New Trip</Button>
-          )}
-        </div>
+    <div className="container py-4">
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 className="mb-0">Trips Management</h2>
+        <Button onClick={() => router.push('/admin/trips/new')} variant="primary">Create New Trip</Button>
       </div>
-      
-      {showForm && (
-        <Card className="mb-6">
-          <h2 className="text-xl font-semibold mb-4">{isEditing ? 'Edit Trip' : 'Schedule New Trip'}</h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Bus</label>
-                <select
-                  name="busId"
-                  value={formData.busId}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                >
-                  <option value="">Select a bus</option>
-                  {buses.map(bus => (
-                    <option key={bus.id} value={bus.id}>
-                      {bus.busNumber} - {bus.busType} - {bus.route?.source} to {bus.route?.destination}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                >
-                  <option value="SCHEDULED">Scheduled</option>
-                  <option value="IN_PROGRESS">In Progress</option>
-                  <option value="COMPLETED">Completed</option>
-                  <option value="CANCELLED">Cancelled</option>
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Departure Time</label>
-                <input
-                  type="datetime-local"
-                  name="departureTime"
-                  value={formData.departureTime}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Arrival Time</label>
-                <input
-                  type="datetime-local"
-                  name="arrivalTime"
-                  value={formData.arrivalTime}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                />
-              </div>
-            </div>
-            
-            <div className="flex gap-2">
-              <Button type="submit">{isEditing ? 'Update Trip' : 'Schedule Trip'}</Button>
-              <Button type="button" onClick={resetForm} variant="secondary">Cancel</Button>
-            </div>
-          </form>
-        </Card>
-      )}
-      
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Route</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bus</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departure</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Arrival</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {trips.length === 0 ? (
+      {/* Tabs */}
+      <ul className="nav nav-tabs mb-3">
+        <li className="nav-item">
+          <button
+            className={`nav-link${activeTab === 'upcoming' ? ' active' : ''}`}
+            onClick={() => setActiveTab('upcoming')}
+          >
+            Upcoming Trips
+          </button>
+        </li>
+        <li className="nav-item">
+          <button
+            className={`nav-link${activeTab === 'history' ? ' active' : ''}`}
+            onClick={() => setActiveTab('history')}
+          >
+            Trip History
+          </button>
+        </li>
+      </ul>
+      {/* Trips Table */}
+      <div className="card shadow-sm">
+        <div className="card-header bg-white d-flex justify-content-between align-items-center">
+          <h5 className="mb-0">{activeTab === 'upcoming' ? 'Upcoming Trips' : 'Trip History'}</h5>
+          <span className="badge bg-primary fs-6">{(activeTab === 'upcoming' ? upcomingTrips.length : historicalTrips.length)} Trips</span>
+        </div>
+        <div className="table-responsive">
+          <table className="table table-hover align-middle mb-0">
+            <thead className="table-light">
               <tr>
-                <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
-                  No trips found.
-                </td>
+                <th>Bus & Route</th>
+                <th>Schedule</th>
+                <th>Status</th>
+                <th>Seats</th>
+                <th>Actions</th>
               </tr>
-            ) : (
-              trips.map((trip) => (
-                <tr key={trip.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {trip.route?.name || `${trip.route?.source} to ${trip.route?.destination}` || 'N/A'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {trip.bus?.busNumber} ({trip.bus?.busType})
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {formatDateTimeForDisplay(trip.departureTime)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {formatDateTimeForDisplay(trip.arrivalTime)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                      ${trip.status === 'SCHEDULED' ? 'bg-blue-100 text-blue-800' : 
-                        trip.status === 'IN_PROGRESS' ? 'bg-yellow-100 text-yellow-800' : 
-                        trip.status === 'COMPLETED' ? 'bg-green-100 text-green-800' : 
-                        'bg-red-100 text-red-800'}`}
-                    >
-                      {trip.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button 
-                      onClick={() => handleEdit(trip)}
-                      className="text-indigo-600 hover:text-indigo-900 mr-4"
-                    >
-                      Edit
-                    </button>
-                  </td>
+            </thead>
+            <tbody>
+              {(activeTab === 'upcoming' ? upcomingTrips : historicalTrips).length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="text-center text-muted">No trips found.</td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                (activeTab === 'upcoming' ? upcomingTrips : historicalTrips).map((trip) => (
+                  <tr key={trip.id}>
+                    <td>
+                      <div className="d-flex align-items-center">
+                        <Bus className="me-2 text-secondary" size={28} />
+                        <div>
+                          <div className="fw-semibold">Bus {trip.bus.busNumber}</div>
+                          <div className="text-muted small">{trip.bus.route.name}</div>
+                          <div className="text-muted small"><i className="bi bi-geo-alt-fill me-1"></i>{trip.bus.route.source} → {trip.bus.route.destination}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="mb-1"><i className="bi bi-calendar-event me-1"></i>{format(new Date(trip.departureTime), 'dd MMM yyyy, h:mm a')}</div>
+                      <div className="text-muted small"><i className="bi bi-clock me-1"></i>Arrives: {format(new Date(trip.arrivalTime), 'dd MMM, h:mm a')}</div>
+                    </td>
+                    <td>
+                      <span className={`badge ${trip.status === 'SCHEDULED' ? 'bg-primary' : trip.status === 'IN_PROGRESS' ? 'bg-success' : trip.status === 'COMPLETED' ? 'bg-secondary' : 'bg-danger'}`}>{trip.status.replace('_', ' ')}</span>
+                    </td>
+                    <td>
+                      <span className="badge bg-info text-dark">{trip.availableSeats} / {trip.totalSeats}</span>
+                    </td>
+                    <td>
+                      <Button size="sm" variant="primary" onClick={() => router.push(`/admin/trips/${trip.id}`)}>View</Button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

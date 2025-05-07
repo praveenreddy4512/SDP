@@ -59,13 +59,9 @@ export default function Navigation() {
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
                 <span className="text-gray-700">{session.user?.name}</span>
-                <Button 
-                  variant="secondary" 
-                  size="sm" 
-                  onClick={() => signOut({ callbackUrl: '/' })}
-                >
-                  Logout
-                </Button>
+                <Link href="/auth/logout">
+                  <Button variant="secondary" size="sm">Logout</Button>
+                </Link>
               </div>
             ) : (
               <div className="flex items-center space-x-4">

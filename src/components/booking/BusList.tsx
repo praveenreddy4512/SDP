@@ -1,6 +1,5 @@
 import React from 'react';
 import { format } from 'date-fns';
-import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 
 interface Bus {
@@ -70,17 +69,17 @@ const BusList: React.FC<BusListProps> = ({ trips, onSelectTrip, isLoading = fals
   
   if (!trips.length) {
     return (
-      <Card className="text-center py-10">
+      <div className="text-center py-10">
         <p className="text-gray-500">No buses available for the selected criteria.</p>
         <p className="text-sm text-gray-400 mt-2">Try changing your filters or selecting a different date.</p>
-      </Card>
+      </div>
     );
   }
   
   return (
     <div className="space-y-4">
       {trips.map((trip) => (
-        <Card key={trip.id} className="border border-gray-200 hover:shadow-md transition-shadow">
+        <div key={trip.id} className="border border-gray-200 hover:shadow-md transition-shadow rounded-lg p-4">
           <div className="flex flex-col sm:flex-row justify-between">
             <div className="flex-1">
               <div className="flex items-center mb-2">
@@ -142,7 +141,7 @@ const BusList: React.FC<BusListProps> = ({ trips, onSelectTrip, isLoading = fals
               )}
             </div>
           </div>
-        </Card>
+        </div>
       ))}
     </div>
   );

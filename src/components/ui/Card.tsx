@@ -3,6 +3,7 @@ import React from 'react';
 interface CardProps {
   children: React.ReactNode;
   className?: string;
+  onClick?: () => void;
 }
 
 interface CardContentProps {
@@ -20,9 +21,9 @@ interface CardTitleProps {
   className?: string;
 }
 
-const Card: React.FC<CardProps> = ({ children, className = '' }) => {
+const Card: React.FC<CardProps> = ({ children, className = '', onClick }) => {
   return (
-    <div className={`bg-white rounded-lg overflow-hidden ${className}`}>
+    <div className={className} onClick={onClick}>
       {children}
     </div>
   );
@@ -30,7 +31,7 @@ const Card: React.FC<CardProps> = ({ children, className = '' }) => {
 
 const CardHeader: React.FC<CardHeaderProps> = ({ children, className = '' }) => {
   return (
-    <div className={`p-6 border-b border-gray-200 ${className}`}>
+    <div className={className}>
       {children}
     </div>
   );
@@ -38,19 +39,19 @@ const CardHeader: React.FC<CardHeaderProps> = ({ children, className = '' }) => 
 
 const CardTitle: React.FC<CardTitleProps> = ({ children, className = '' }) => {
   return (
-    <h3 className={`text-lg font-medium text-gray-900 ${className}`}>
+    <h3 className={className}>
       {children}
     </h3>
   );
 };
 
-export const CardContent: React.FC<CardContentProps> = ({ children, className = '' }) => {
+const CardContent: React.FC<CardContentProps> = ({ children, className = '' }) => {
   return (
-    <div className={`p-6 text-gray-900 ${className}`}>
+    <div className={className}>
       {children}
     </div>
   );
 };
 
-export { CardHeader, CardTitle };
+export { Card, CardHeader, CardTitle, CardContent };
 export default Card; 

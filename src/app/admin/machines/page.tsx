@@ -169,139 +169,107 @@ export default function MachinesManagement() {
 
   if (loading) {
     return (
-      <div className="container mx-auto py-8 px-4">
-        <div className="flex justify-center items-center h-64">
-          <p className="text-gray-500">Loading...</p>
+      <div className="container py-5">
+        <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '300px' }}>
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Machines Management</h1>
-        <div className="flex gap-2">
-          <Button onClick={() => router.push('/admin')}>Back to Dashboard</Button>
+    <div className="container py-4">
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 className="mb-0">Machines Management</h2>
+        <div className="d-flex gap-2">
+          <Button onClick={() => router.push('/admin')} variant="secondary">Back to Dashboard</Button>
           {!showForm && (
-            <Button onClick={() => setShowForm(true)}>Add New Machine</Button>
+            <Button onClick={() => setShowForm(true)} variant="primary">Add New Machine</Button>
           )}
         </div>
       </div>
-      
       {showForm && (
-        <Card className="mb-6">
-          <h2 className="text-xl font-semibold mb-4">{isEditing ? 'Edit Machine' : 'Add New Machine'}</h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                <input
-                  type="text"
-                  name="location"
-                  value={formData.location}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Route</label>
-                <select
-                  name="routeId"
-                  value={formData.routeId}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                >
-                  <option value="">Select a route</option>
-                  {routes.map(route => (
-                    <option key={route.id} value={route.id}>
-                      {route.name} ({route.source} to {route.destination})
-                    </option>
-                  ))}
-                </select>
-              </div>
-              
-              {isEditing && (
-                <div className="flex items-center mt-2">
-                  <input
-                    type="checkbox"
-                    name="isActive"
-                    checked={formData.isActive}
-                    onChange={handleInputChange}
-                    className="h-4 w-4 text-blue-600 border-gray-300 rounded"
-                  />
-                  <label className="ml-2 block text-sm text-gray-700">Active</label>
+        <div className="card mb-4 shadow-sm">
+          <div className="card-header bg-primary text-white">
+            <h5 className="mb-0">{isEditing ? 'Edit Machine' : 'Add New Machine'}</h5>
+          </div>
+          <div className="card-body">
+            <form onSubmit={handleSubmit}>
+              <div className="row g-3">
+                <div className="col-md-6">
+                  <label className="form-label">Name</label>
+                  <input type="text" name="name" value={formData.name} onChange={handleInputChange} required placeholder="e.g. Self POS 1" className="form-control" />
                 </div>
-              )}
-            </div>
-            
-            <div className="flex gap-2">
-              <Button type="submit">{isEditing ? 'Update Machine' : 'Add Machine'}</Button>
-              <Button type="button" onClick={resetForm} variant="secondary">Cancel</Button>
-            </div>
-          </form>
-        </Card>
+                <div className="col-md-6">
+                  <label className="form-label">Location</label>
+                  <input type="text" name="location" value={formData.location} onChange={handleInputChange} required placeholder="e.g. Hyderabad Bus Station" className="form-control" />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label">Route</label>
+                  <select name="routeId" value={formData.routeId} onChange={handleInputChange} required className="form-select">
+                    <option value="">Select a route</option>
+                    {routes.map(route => (
+                      <option key={route.id} value={route.id}>{route.name} ({route.source} to {route.destination})</option>
+                    ))}
+                  </select>
+                </div>
+                {isEditing && (
+                  <div className="col-12 form-check mt-2">
+                    <input type="checkbox" name="isActive" checked={formData.isActive} onChange={handleInputChange} className="form-check-input" id="isActiveCheck" />
+                    <label className="form-check-label ms-2" htmlFor="isActiveCheck">Active</label>
+                  </div>
+                )}
+              </div>
+              <div className="d-flex gap-2 mt-4">
+                <Button type="submit" variant="primary">{isEditing ? 'Update Machine' : 'Add Machine'}</Button>
+                <Button type="button" onClick={resetForm} variant="secondary">Cancel</Button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
-      
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Route</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {machines.length === 0 ? (
+      {/* Machines Table */}
+      <div className="card shadow-sm">
+        <div className="card-header bg-white d-flex justify-content-between align-items-center">
+          <h5 className="mb-0">All Machines</h5>
+          <span className="badge bg-primary fs-6">{machines.length} Machines</span>
+        </div>
+        <div className="table-responsive">
+          <table className="table table-hover align-middle mb-0">
+            <thead className="table-light">
               <tr>
-                <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
-                  No machines found.
-                </td>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Route</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
-            ) : (
-              machines.map((machine) => (
-                <tr key={machine.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{machine.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{machine.location}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {machine.route?.name || 'N/A'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${machine.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                      {machine.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button 
-                      onClick={() => handleEdit(machine)}
-                      className="text-indigo-600 hover:text-indigo-900 mr-4"
-                    >
-                      Edit
-                    </button>
-                  </td>
+            </thead>
+            <tbody>
+              {machines.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="text-center text-muted">No machines found.</td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                machines.map((machine) => (
+                  <tr key={machine.id}>
+                    <td className="fw-semibold"><i className="bi bi-cpu-fill text-primary me-2"></i>{machine.name}</td>
+                    <td>{machine.location}</td>
+                    <td>{machine.route?.name || 'N/A'}</td>
+                    <td>
+                      <span className={`badge ${machine.isActive ? 'bg-success' : 'bg-danger'}`}>{machine.isActive ? 'Active' : 'Inactive'}</span>
+                    </td>
+                    <td>
+                      <Button size="sm" variant="primary" onClick={() => handleEdit(machine)}>Edit</Button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

@@ -135,13 +135,8 @@ export async function GET(req: NextRequest) {
 
       return NextResponse.json(trips);
     } else {
-      // Get all upcoming trips
+      // Get all trips
       const trips = await prisma.trip.findMany({
-        where: {
-          departureTime: {
-            gte: new Date()
-          }
-        },
         orderBy: {
           departureTime: 'asc'
         },

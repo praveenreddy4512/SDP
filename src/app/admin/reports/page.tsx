@@ -20,6 +20,8 @@ import {
   LineChart,
   Line
 } from 'recharts';
+import { Calendar, Download, Filter, RefreshCw, TrendingUp, TrendingDown, DollarSign, Ticket, Users, Percent } from "lucide-react";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 interface SalesData {
   totalTickets: number;
@@ -94,20 +96,6 @@ export default function ReportsAnalytics() {
     } finally {
       setLoading(false);
     }
-  };
-
-  // Generate data for trends chart - mock data for now
-  const generateTrendData = () => {
-    const labels = period === 'day' ? Array.from({ length: 24 }, (_, i) => `${i}h`)
-      : period === 'week' ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-      : period === 'month' ? Array.from({ length: 30 }, (_, i) => `${i + 1}`)
-      : Array.from({ length: 12 }, (_, i) => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][i]);
-    
-    return labels.map((label) => ({
-      name: label,
-      sales: Math.floor(Math.random() * 50) + 10,
-      revenue: Math.floor(Math.random() * 1000) + 200
-    }));
   };
 
   if (loading) {
@@ -208,8 +196,10 @@ export default function ReportsAnalytics() {
   };
 
   const renderSalesTrend = () => {
-    const trendData = generateTrendData();
-    
+    const trendData = salesData && (salesData as any).trend ? (salesData as any).trend : [];
+    if (!trendData.length) {
+      return <p className="text-center text-muted py-4">No trend data available</p>;
+    }
     return (
       <ResponsiveContainer width="100%" height={300}>
         <LineChart
@@ -238,280 +228,312 @@ export default function ReportsAnalytics() {
 
   const renderOverviewSection = () => (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Card className="p-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-blue-100">Total Tickets</p>
-              <h2 className="text-3xl font-bold mt-1">{salesData?.totalTickets || 0}</h2>
-            </div>
-            <div className="p-3 bg-blue-400 bg-opacity-30 rounded-full">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
-              </svg>
+      <div className="row g-4 mb-4">
+        <div className="col-md-4">
+          <div className="card bg-primary text-white h-100">
+            <div className="card-body">
+              <div className="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 className="card-subtitle mb-2 text-white-50">Total Tickets</h6>
+                  <h2 className="card-title mb-0">{salesData?.totalTickets || 0}</h2>
+                </div>
+                <div className="p-3 bg-white bg-opacity-25 rounded-circle">
+                  <Ticket className="text-white" size={24} />
+                </div>
+              </div>
+              <p className="card-text small text-white-50 mt-2">
+                {period === "day" ? "Today" : 
+                 period === "week" ? "This Week" : 
+                 period === "month" ? "This Month" : "This Year"}
+              </p>
             </div>
           </div>
-          <p className="text-xs text-blue-100 mt-2">
-            {period === "day" ? "Today" : 
-             period === "week" ? "This Week" : 
-             period === "month" ? "This Month" : "This Year"}
-          </p>
-        </Card>
+        </div>
         
-        <Card className="p-6 bg-gradient-to-r from-green-500 to-green-600 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-green-100">Total Revenue</p>
-              <h2 className="text-3xl font-bold mt-1">{formatCurrency(salesData?.totalRevenue || 0)}</h2>
-            </div>
-            <div className="p-3 bg-green-400 bg-opacity-30 rounded-full">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+        <div className="col-md-4">
+          <div className="card bg-success text-white h-100">
+            <div className="card-body">
+              <div className="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 className="card-subtitle mb-2 text-white-50">Total Revenue</h6>
+                  <h2 className="card-title mb-0">{formatCurrency(salesData?.totalRevenue || 0)}</h2>
+                </div>
+                <div className="p-3 bg-white bg-opacity-25 rounded-circle">
+                  <DollarSign className="text-white" size={24} />
+                </div>
+              </div>
+              <p className="card-text small text-white-50 mt-2">
+                {period === "day" ? "Today" : 
+                 period === "week" ? "This Week" : 
+                 period === "month" ? "This Month" : "This Year"}
+              </p>
             </div>
           </div>
-          <p className="text-xs text-green-100 mt-2">
-            {period === "day" ? "Today" : 
-             period === "week" ? "This Week" : 
-             period === "month" ? "This Month" : "This Year"}
-          </p>
-        </Card>
+        </div>
         
-        <Card className="p-6 bg-gradient-to-r from-purple-500 to-purple-600 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-purple-100">Average Ticket Price</p>
-              <h2 className="text-3xl font-bold mt-1">
-                {formatCurrency(salesData && salesData.totalTickets > 0 ? salesData.totalRevenue / salesData.totalTickets : 0)}
-              </h2>
-            </div>
-            <div className="p-3 bg-purple-400 bg-opacity-30 rounded-full">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-              </svg>
+        <div className="col-md-4">
+          <div className="card bg-info text-white h-100">
+            <div className="card-body">
+              <div className="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 className="card-subtitle mb-2 text-white-50">Average Ticket Price</h6>
+                  <h2 className="card-title mb-0">
+                    {formatCurrency(salesData && salesData.totalTickets > 0 ? salesData.totalRevenue / salesData.totalTickets : 0)}
+                  </h2>
+                </div>
+                <div className="p-3 bg-white bg-opacity-25 rounded-circle">
+                  <TrendingUp className="text-white" size={24} />
+                </div>
+              </div>
+              <p className="card-text small text-white-50 mt-2">Per ticket</p>
             </div>
           </div>
-          <p className="text-xs text-purple-100 mt-2">Per ticket</p>
-        </Card>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <Card>
-          <div className="px-6 py-4 border-b flex justify-between items-center">
-            <h2 className="text-lg font-semibold">Sales Trend</h2>
-            <div className="text-sm text-gray-500">
-              {period === "day" ? "Hourly" : 
-               period === "week" ? "Daily" : 
-               period === "month" ? "Daily" : "Monthly"}
+      <div className="row g-4 mb-4">
+        <div className="col-lg-6">
+          <div className="card h-100">
+            <div className="card-header bg-white">
+              <h5 className="card-title mb-0">Sales Trend</h5>
+              <small className="text-muted">
+                {period === "day" ? "Hourly" : 
+                 period === "week" ? "Daily" : 
+                 period === "month" ? "Daily" : "Monthly"}
+              </small>
+            </div>
+            <div className="card-body">
+              {renderSalesTrend()}
             </div>
           </div>
-          <div className="p-4">
-            {renderSalesTrend()}
-          </div>
-        </Card>
+        </div>
         
-        <Card>
-          <div className="px-6 py-4 border-b">
-            <h2 className="text-lg font-semibold">Tickets by Route</h2>
+        <div className="col-lg-6">
+          <div className="card h-100">
+            <div className="card-header bg-white">
+              <h5 className="card-title mb-0">Tickets by Route</h5>
+            </div>
+            <div className="card-body">
+              {renderRoutesPieChart()}
+            </div>
           </div>
-          <div className="p-4">
-            {renderRoutesPieChart()}
-          </div>
-        </Card>
+        </div>
       </div>
       
-      <Card className="mb-6">
-        <div className="px-6 py-4 border-b">
-          <h2 className="text-lg font-semibold">Vendor Performance</h2>
+      <div className="card mb-4">
+        <div className="card-header bg-white">
+          <h5 className="card-title mb-0">Vendor Performance</h5>
         </div>
-        <div className="p-4">
+        <div className="card-body">
           {renderVendorsBarChart()}
         </div>
-      </Card>
+      </div>
     </>
   );
 
   const renderRoutesSection = () => (
-    <Card>
-      <div className="px-6 py-4 border-b">
-        <h2 className="text-lg font-semibold">Route Performance</h2>
+    <div>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h4 className="mb-0">Route Performance</h4>
+        <span className="badge bg-primary fs-6">{salesData?.ticketsByRoute.length || 0} Routes</span>
       </div>
-      <div className="p-4">
-        {salesData?.ticketsByRoute.length === 0 ? (
-          <p className="text-gray-500 text-center py-4">No route data available for this period</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full">
-              <thead>
-                <tr className="bg-gray-50">
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Route</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tickets Sold</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Revenue</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg. Ticket Price</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">% of Total</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {salesData?.ticketsByRoute.map((route, index) => (
-                  <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{route.routeName}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{route.count}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatCurrency(route.revenue)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {formatCurrency(route.count > 0 ? route.revenue / route.count : 0)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {salesData.totalTickets > 0 ? ((route.count / salesData.totalTickets) * 100).toFixed(1) + '%' : '0%'}
-                    </td>
+      <div className="card shadow-sm">
+        <div className="card-body p-0">
+          {salesData?.ticketsByRoute.length === 0 ? (
+            <p className="text-muted text-center py-4 mb-0">No route data available for this period</p>
+          ) : (
+            <div className="table-responsive">
+              <table className="table table-hover align-middle mb-0">
+                <thead className="table-light">
+                  <tr>
+                    <th>Route</th>
+                    <th>Tickets Sold</th>
+                    <th>Revenue</th>
+                    <th>Avg. Ticket Price</th>
+                    <th>% of Total</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                </thead>
+                <tbody>
+                  {salesData?.ticketsByRoute.map((route, index) => (
+                    <tr key={index}>
+                      <td className="fw-semibold">
+                        <i className="bi bi-geo-alt-fill text-primary me-2"></i>
+                        {route.routeName}
+                        {index === 0 && <span className="badge bg-success ms-2">Top Route</span>}
+                      </td>
+                      <td>{route.count}</td>
+                      <td><span className="badge bg-info text-dark">{formatCurrency(route.revenue)}</span></td>
+                      <td>{formatCurrency(route.count > 0 ? route.revenue / route.count : 0)}</td>
+                      <td>
+                        <div className="progress" style={{ height: '8px' }}>
+                          <div className="progress-bar bg-primary" role="progressbar" style={{ width: `${salesData.totalTickets > 0 ? (route.count / salesData.totalTickets) * 100 : 0}%` }} aria-valuenow={route.count} aria-valuemin={0} aria-valuemax={salesData.totalTickets}></div>
+                        </div>
+                        <span className="small ms-2">{salesData.totalTickets > 0 ? ((route.count / salesData.totalTickets) * 100).toFixed(1) + '%' : '0%'}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
-    </Card>
+    </div>
   );
 
   const renderVendorsSection = () => (
-    <Card>
-      <div className="px-6 py-4 border-b">
-        <h2 className="text-lg font-semibold">Vendor Performance</h2>
+    <div>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h4 className="mb-0">Vendor Performance</h4>
+        <span className="badge bg-primary fs-6">{salesData?.ticketsByVendor.length || 0} Vendors</span>
       </div>
-      <div className="p-4">
-        {salesData?.ticketsByVendor.length === 0 ? (
-          <p className="text-gray-500 text-center py-4">No vendor data available for this period</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full">
-              <thead>
-                <tr className="bg-gray-50">
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tickets Sold</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Revenue</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg. Ticket Price</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">% of Total</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {salesData?.ticketsByVendor.map((vendor, index) => (
-                  <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{vendor.vendorName}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{vendor.count}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatCurrency(vendor.revenue)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {formatCurrency(vendor.count > 0 ? vendor.revenue / vendor.count : 0)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {salesData.totalTickets > 0 ? ((vendor.count / salesData.totalTickets) * 100).toFixed(1) + '%' : '0%'}
-                    </td>
+      <div className="card shadow-sm">
+        <div className="card-body p-0">
+          {salesData?.ticketsByVendor.length === 0 ? (
+            <p className="text-muted text-center py-4 mb-0">No vendor data available for this period</p>
+          ) : (
+            <div className="table-responsive">
+              <table className="table table-hover align-middle mb-0">
+                <thead className="table-light">
+                  <tr>
+                    <th>Vendor</th>
+                    <th>Tickets Sold</th>
+                    <th>Revenue</th>
+                    <th>Avg. Ticket Price</th>
+                    <th>% of Total</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                </thead>
+                <tbody>
+                  {salesData?.ticketsByVendor.map((vendor, index) => (
+                    <tr key={index}>
+                      <td className="fw-semibold">
+                        <i className="bi bi-person-badge-fill text-secondary me-2"></i>
+                        {vendor.vendorName}
+                        {index === 0 && <span className="badge bg-success ms-2">Top Vendor</span>}
+                      </td>
+                      <td>{vendor.count}</td>
+                      <td><span className="badge bg-info text-dark">{formatCurrency(vendor.revenue)}</span></td>
+                      <td>{formatCurrency(vendor.count > 0 ? vendor.revenue / vendor.count : 0)}</td>
+                      <td>
+                        <div className="progress" style={{ height: '8px' }}>
+                          <div className="progress-bar bg-secondary" role="progressbar" style={{ width: `${salesData.totalTickets > 0 ? (vendor.count / salesData.totalTickets) * 100 : 0}%` }} aria-valuenow={vendor.count} aria-valuemin={0} aria-valuemax={salesData.totalTickets}></div>
+                        </div>
+                        <span className="small ms-2">{salesData.totalTickets > 0 ? ((vendor.count / salesData.totalTickets) * 100).toFixed(1) + '%' : '0%'}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
-    </Card>
+    </div>
   );
 
   const renderTicketsSection = () => (
-    <Card>
-      <div className="px-6 py-4 border-b">
-        <h2 className="text-lg font-semibold">Recent Ticket Sales</h2>
+    <div>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h4 className="mb-0">Recent Ticket Sales</h4>
+        <span className="badge bg-primary fs-6">{salesData?.recentTickets.length || 0} Tickets</span>
       </div>
-      <div className="p-4">
-        {salesData?.recentTickets.length === 0 ? (
-          <p className="text-gray-500 text-center py-4">No recent tickets available for this period</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full">
-              <thead>
-                <tr className="bg-gray-50">
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ticket ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Passenger</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Route</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {salesData?.recentTickets.map((ticket, index) => (
-                  <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{ticket.id}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{ticket.passengerName}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{ticket.routeName}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(ticket.date).toLocaleDateString()}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatCurrency(ticket.amount)}</td>
+      <div className="card shadow-sm">
+        <div className="card-body p-0">
+          {salesData?.recentTickets.length === 0 ? (
+            <p className="text-muted text-center py-4 mb-0">No recent tickets available for this period</p>
+          ) : (
+            <div className="table-responsive">
+              <table className="table table-hover align-middle mb-0">
+                <thead className="table-light">
+                  <tr>
+                    <th>Ticket ID</th>
+                    <th>Passenger</th>
+                    <th>Route</th>
+                    <th>Date</th>
+                    <th>Amount</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                </thead>
+                <tbody>
+                  {salesData?.recentTickets.map((ticket, index) => (
+                    <tr key={index}>
+                      <td className="fw-semibold">
+                        <i className="bi bi-ticket-perforated-fill text-danger me-2"></i>
+                        {ticket.id}
+                      </td>
+                      <td>{ticket.passengerName}</td>
+                      <td>{ticket.routeName}</td>
+                      <td>{ticket.date}</td>
+                      <td><span className="badge bg-info text-dark">{formatCurrency(ticket.amount)}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
-    </Card>
+    </div>
   );
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <h1 className="text-2xl font-bold">Analytics Dashboard</h1>
-        <div className="flex gap-2">
+    <div className="container py-4">
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+        <h1 className="h2 mb-0">Analytics Dashboard</h1>
+        <div className="d-flex gap-2">
           <Button onClick={() => router.push('/admin')} variant="secondary">Back to Dashboard</Button>
           <Button onClick={loadSalesData}>Refresh Data</Button>
         </div>
       </div>
       
-      <div className="flex flex-wrap gap-2 mb-6 bg-white p-2 rounded-lg shadow-sm">
+      <div className="d-flex flex-wrap gap-2 mb-4 bg-white p-2 rounded shadow-sm">
         <button 
           onClick={() => setPeriod("day")}
-          className={`px-4 py-2 rounded-md transition-colors ${period === "day" ? "bg-blue-500 text-white" : "bg-gray-100 hover:bg-gray-200"}`}
+          className={`btn ${period === "day" ? "btn-primary" : "btn-light"}`}
         >
           Today
         </button>
         <button 
           onClick={() => setPeriod("week")}
-          className={`px-4 py-2 rounded-md transition-colors ${period === "week" ? "bg-blue-500 text-white" : "bg-gray-100 hover:bg-gray-200"}`}
+          className={`btn ${period === "week" ? "btn-primary" : "btn-light"}`}
         >
           This Week
         </button>
         <button 
           onClick={() => setPeriod("month")}
-          className={`px-4 py-2 rounded-md transition-colors ${period === "month" ? "bg-blue-500 text-white" : "bg-gray-100 hover:bg-gray-200"}`}
+          className={`btn ${period === "month" ? "btn-primary" : "btn-light"}`}
         >
           This Month
         </button>
         <button 
           onClick={() => setPeriod("year")}
-          className={`px-4 py-2 rounded-md transition-colors ${period === "year" ? "bg-blue-500 text-white" : "bg-gray-100 hover:bg-gray-200"}`}
+          className={`btn ${period === "year" ? "btn-primary" : "btn-light"}`}
         >
           This Year
         </button>
       </div>
       
-      <div className="flex flex-wrap gap-2 mb-6 bg-white p-2 rounded-lg shadow-sm">
+      <div className="d-flex flex-wrap gap-2 mb-4 bg-white p-2 rounded shadow-sm">
         <button 
           onClick={() => setCurrentView("overview")}
-          className={`px-4 py-2 rounded-md transition-colors ${currentView === "overview" ? "bg-blue-500 text-white" : "bg-gray-100 hover:bg-gray-200"}`}
+          className={`btn ${currentView === "overview" ? "btn-primary" : "btn-light"}`}
         >
           Overview
         </button>
         <button 
           onClick={() => setCurrentView("routes")}
-          className={`px-4 py-2 rounded-md transition-colors ${currentView === "routes" ? "bg-blue-500 text-white" : "bg-gray-100 hover:bg-gray-200"}`}
+          className={`btn ${currentView === "routes" ? "btn-primary" : "btn-light"}`}
         >
           Routes
         </button>
         <button 
           onClick={() => setCurrentView("vendors")}
-          className={`px-4 py-2 rounded-md transition-colors ${currentView === "vendors" ? "bg-blue-500 text-white" : "bg-gray-100 hover:bg-gray-200"}`}
+          className={`btn ${currentView === "vendors" ? "btn-primary" : "btn-light"}`}
         >
           Vendors
         </button>
         <button 
           onClick={() => setCurrentView("tickets")}
-          className={`px-4 py-2 rounded-md transition-colors ${currentView === "tickets" ? "bg-blue-500 text-white" : "bg-gray-100 hover:bg-gray-200"}`}
+          className={`btn ${currentView === "tickets" ? "btn-primary" : "btn-light"}`}
         >
           Tickets
         </button>
