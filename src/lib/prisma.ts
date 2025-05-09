@@ -4,6 +4,4 @@ import { PrismaClient } from '@prisma/client';
 // exhausting your database connection limit.
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
-const prisma = new PrismaClient();
-
-export default prisma; 
+export const prisma = new PrismaClient(); 
