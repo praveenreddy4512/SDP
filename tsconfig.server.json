@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "outDir": "dist",
+    "target": "es2017",
+    "isolatedModules": false,
+    "noEmit": false,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src/server/**/*", "src/lib/**/*"],
+  "ts-node": {
+    "transpileOnly": true,
+    "files": true
+  }
+} 

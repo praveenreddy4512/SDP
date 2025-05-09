@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Card from '@/components/ui/Card';
 import { StarIcon } from '@heroicons/react/24/solid';
+import { CheckCircleIcon } from '@heroicons/react/24/outline';
 
 interface Review {
   id: string;
@@ -32,6 +33,16 @@ export default function AdminReviewsPage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showThankYou, setShowThankYou] = useState(false);
+  const [form, setForm] = useState({
+    rating: 5,
+    review: '',
+    passengerName: '',
+    busNumber: '',
+    source: '',
+    destination: ''
+  });
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -65,6 +76,27 @@ export default function AdminReviewsPage() {
     }
   };
 
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleRatingChange = (rating: number) => {
+    setForm({ ...form, rating });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    // Simulate API call
+    setTimeout(() => {
+      setShowThankYou(true);
+      setSubmitting(false);
+      setForm({ rating: 5, review: '', passengerName: '', busNumber: '', source: '', destination: '' });
+      fetchReviews();
+      setTimeout(() => setShowThankYou(false), 3000);
+    }, 1200);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -74,14 +106,97 @@ export default function AdminReviewsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Customer Reviews</h1>
-          <p className="mt-2 text-sm text-gray-700">
-            View and manage customer reviews for trips
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 py-8">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8 flex items-center gap-3">
+          <StarIcon className="h-8 w-8 text-yellow-400" />
+          <h1 className="text-3xl font-extrabold text-gray-900">Customer Reviews</h1>
         </div>
+        <p className="mb-6 text-md text-gray-700">
+          View, manage, and add customer reviews for trips
+        </p>
+
+        {/* Review Submission Form */}
+        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">Add a Review</h2>
+          <div className="flex items-center mb-4">
+            <span className="mr-2 text-gray-600">Rating:</span>
+            {[...Array(5)].map((_, i) => (
+              <button
+                type="button"
+                key={i}
+                onClick={() => handleRatingChange(i + 1)}
+                className="focus:outline-none"
+              >
+                <StarIcon
+                  className={`h-6 w-6 ${i < form.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                />
+              </button>
+            ))}
+          </div>
+          <div className="mb-3">
+            <input
+              type="text"
+              name="passengerName"
+              value={form.passengerName}
+              onChange={handleFormChange}
+              placeholder="Passenger Name"
+              className="w-full border rounded px-3 py-2 mb-2"
+              required
+            />
+            <input
+              type="text"
+              name="busNumber"
+              value={form.busNumber}
+              onChange={handleFormChange}
+              placeholder="Bus Number"
+              className="w-full border rounded px-3 py-2 mb-2"
+              required
+            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                name="source"
+                value={form.source}
+                onChange={handleFormChange}
+                placeholder="Source"
+                className="w-1/2 border rounded px-3 py-2 mb-2"
+                required
+              />
+              <input
+                type="text"
+                name="destination"
+                value={form.destination}
+                onChange={handleFormChange}
+                placeholder="Destination"
+                className="w-1/2 border rounded px-3 py-2 mb-2"
+                required
+              />
+            </div>
+            <textarea
+              name="review"
+              value={form.review}
+              onChange={handleFormChange}
+              placeholder="Write your review..."
+              className="w-full border rounded px-3 py-2"
+              rows={3}
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            className="bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-2 rounded shadow"
+            disabled={submitting}
+          >
+            {submitting ? 'Submitting...' : 'Submit Review'}
+          </button>
+          {showThankYou && (
+            <div className="flex items-center mt-4 text-green-700 bg-green-100 rounded p-3 animate-fade-in">
+              <CheckCircleIcon className="h-6 w-6 mr-2 text-green-500" />
+              Thank you for your review!
+            </div>
+          )}
+        </form>
 
         {error && (
           <div className="mb-4 bg-red-50 text-red-600 p-4 rounded-md">
@@ -91,7 +206,7 @@ export default function AdminReviewsPage() {
 
         <div className="grid gap-6">
           {reviews.map((review) => (
-            <Card key={review.id} className="p-6">
+            <Card key={review.id} className="p-6 hover:shadow-lg transition-shadow border border-gray-100 bg-white rounded-lg">
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center mb-2">
